@@ -1,0 +1,49 @@
+{
+  "schema_version": 3,
+  "food_items": [
+    {
+      "id": 1,
+      "name": "Oats",
+      "caloriesPer100g": 380.0
+    }
+  ],
+  "meals": [
+    {
+      "id": 1,
+      "loggedAt": "2026-11-12T08:00:00.000Z",
+      "mealType": "breakfast"
+    }
+  ],
+  "meal_entries": [
+    {
+      "id": 1,
+      "mealId": 1,
+      "foodItemId": 1,
+      "grams": 50.0,
+      "calories": 190.0
+    }
+  ],
+  "exercises": [
+    {
+      "id": 1,
+      "name": "Squat"
+    }
+  ],
+  "workouts": [
+    {
+      "id": 1,
+      "startedAt": "2026-11-12T17:00:00.000Z",
+      "notes": "Leg day"
+    }
+  ],
+  "workout_sets": [
+    {
+      "id": 1,
+      "workoutId": 1,
+      "exerciseId": 1,
+      "setNumber": 1,
+      "reps": 5,
+      "weightKg": 80.0
+    }
+  ]
+}

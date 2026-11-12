@@ -1,0 +1,28 @@
+# Flutter / Dart
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+.idea/
+.vscode/
+
+# iOS / Android build outputs and signing (never commit)
+*.ipa
+*.keystore
+*.jks
+key.properties
+*.p12
+*.mobileprovision
+*.provisionprofile
+*.cer
+*.pem
+.env
+.env.*
+!.env.example
+ios/Pods/
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+android/local.properties
+android/.gradle/
