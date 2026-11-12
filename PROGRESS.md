@@ -42,3 +42,9 @@
 - Verified: `dart run build_runner build --delete-conflicting-outputs` required the Dart 3.10 `--force-jit` workaround and then completed; `dart format .` completed successfully; `flutter analyze` completed with `No issues found!`; `flutter test` completed with `All tests passed!` (17 tests).
 - Open: Emulator checklist: export a backup, clear or reinstall the app, import the backup, and confirm the calorie total and workouts match.
 - Decisions needing user input: none.
+
+## 2026-11-12
+- Done: Initialized Git on `main`, added ignore rules for build outputs, environment files, and signing artifacts, and pushed the initial commit to the GitHub `main` branch. Added the iOS 13 Podfile, the Codemagic `ios-unsigned` workflow, and exact Codemagic/Sideloadly instructions.
+- Verified: Flutter `3.38.9` with Dart `3.10.8` is installed; `ios/Runner.xcodeproj` exists and targets iOS `13.0`; `flutter pub get`, `dart run build_runner build --delete-conflicting-outputs --force-jit`, `flutter analyze`, and `flutter test` completed successfully (17 tests); `codemagic.yaml` parsed successfully and contains the required workflow commands and artifact. Drift generation's `--force-jit` flag is a local Dart 3.10 workaround and must be re-checked after package updates.
+- Open: Run the real Codemagic cloud build, download the unsigned IPA, and install it with Sideloadly on the iPhone XR. The bundle identifier currently differs from the requested value: `com.maurik.kainTrack` (not `com.maurik.kain_track`).
+- Decisions needing user input: none. The GitHub repository is public by explicit choice; private visibility remains recommended for personal health-data structure.

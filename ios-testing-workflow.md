@@ -3,7 +3,7 @@
 Target device: iPhone XR (iOS 18 max)
 
 ## Overview
-Develop on a Windows or Linux laptop, build the iOS app in the cloud, and install it on the iPhone from the laptop.
+Develop on a Windows or Linux laptop, build the iOS app in the cloud, and install it on the iPhone from the laptop. The repository currently uses a public GitHub repository by explicit project-owner choice; a private repository is recommended because the project contains personal health data structure.
 
 ## Steps
 
@@ -13,19 +13,24 @@ Develop on a Windows or Linux laptop, build the iOS app in the cloud, and instal
    - Test with an Android emulator or the Chrome/web target.
 
 2. **Version control**
-   - Create a GitHub repo for the project.
-   - Push the code so Codemagic can access it.
+   - The project is pushed to `https://github.com/Maur1k/kain_track.git` on the `main` branch.
 
 3. **Build iOS in the cloud**
    - Sign up for Codemagic (free tier, limited macOS build minutes).
-   - Connect the GitHub repo.
-   - Configure an unsigned iOS build that outputs an `.ipa`.
-   - Download the `.ipa` from the build artifacts.
+   - In Codemagic, choose **Add application**, select **GitHub**, authorize GitHub access, and select `Maur1k/kain_track`.
+   - Select the **Flutter** project type and choose the `main` branch.
+   - In the workflow selector, choose the repository workflow named **ios-unsigned** from `codemagic.yaml`.
+   - Start the build. The workflow runs `flutter pub get`, Drift code generation, `flutter test`, and `flutter build ios --release --no-codesign`.
+   - Open the completed build's **Artifacts** tab and download `kain_track-unsigned.ipa`.
+   - This workflow intentionally has no certificates, provisioning profiles, Apple credentials, TestFlight publishing, or App Store publishing.
 
 4. **Install on iPhone from Windows**
-   - Install Sideloadly (or AltStore).
-   - Connect the iPhone XR by USB.
-   - Sign in with a free Apple ID and install the `.ipa`.
+   - Download and install Sideloadly from `https://sideloadly.io/`.
+   - Connect the iPhone XR to the laptop by USB, unlock it, and tap **Trust** if prompted.
+   - Open Sideloadly, confirm the connected iPhone XR is selected, and drag `kain_track-unsigned.ipa` into the IPA field.
+   - Enter the Apple ID used for free sideloading, then click **Start** and complete any Apple ID verification prompts. Sideloadly applies the free personal signing required for installation; the Codemagic artifact itself is unsigned.
+   - On the iPhone, open **Settings > General > VPN & Device Management**, select the Apple ID profile, and tap **Trust** if iOS asks.
+   - Launch Kain Track and verify meal, workout, and backup flows. A free Apple ID sideload expires after 7 days and must then be reinstalled.
 
 ## Limitations
 - Free Apple ID sideloads expire after 7 days; reinstall weekly.
@@ -36,7 +41,8 @@ Develop on a Windows or Linux laptop, build the iOS app in the cloud, and instal
 ## Setup Checklist
 - [ ] Flutter and Android Studio installed; `flutter doctor` passes
 - [ ] GitHub repo created and project pushed
-- [ ] Codemagic account connected to the repo
+- [ ] Codemagic account connected to `Maur1k/kain_track`
+- [ ] Codemagic `ios-unsigned` workflow selected
 - [ ] Unsigned iOS `.ipa` build configured
 - [ ] Sideloadly installed
 - [ ] First build installed on iPhone XR
