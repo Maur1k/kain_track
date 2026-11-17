@@ -1,4 +1,3 @@
-import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kain_track/data/db/database.dart';
@@ -15,111 +14,50 @@ void main() {
 
   tearDown(() => database.close());
 
-  test('no entries gives zero calories', () async {
-    expect(await repository.getTodayTotalCalories(), 0);
+  test('calculates nutrition from grams', () async {
+    final egg = (await database.select(database.foods).get()).firstWhere(
+      (food) => food.name == 'Boiled egg (whole)',
+    );
+    final result = nutritionFor(egg, 150);
+    expect(result.calories, 232.5);
+    expect(result.protein, closeTo(18.9, 0.0001));
+    expect(result.carbs, closeTo(1.65, 0.0001));
+    expect(result.fat, closeTo(15.9, 0.0001));
   });
 
-  test('sums today entries and excludes yesterday', () async {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day, 9);
-    final yesterday = today.subtract(const Duration(days: 1));
-
-    final todayMeal = await database.into(database.meals).insert(
-          MealsCompanion.insert(loggedAt: today.toUtc()),
-        );
-    final secondTodayMeal = await database.into(database.meals).insert(
-          MealsCompanion.insert(
-            loggedAt: today.add(const Duration(hours: 2)).toUtc(),
-          ),
-        );
-    final yesterdayMeal = await database.into(database.meals).insert(
-          MealsCompanion.insert(loggedAt: yesterday.toUtc()),
-        );
-
-    await database.batch((batch) {
-      batch.insertAll(database.mealEntries, [
-        MealEntriesCompanion.insert(
-          mealId: todayMeal,
-          foodItemId: const Value(1),
-          grams: const Value(100),
-          calories: 400.0,
-        ),
-        MealEntriesCompanion.insert(
-          mealId: secondTodayMeal,
-          foodItemId: const Value(1),
-          grams: const Value(100),
-          calories: 650.0,
-        ),
-        MealEntriesCompanion.insert(
-          mealId: yesterdayMeal,
-          foodItemId: const Value(1),
-          grams: const Value(100),
-          calories: 999.0,
-        ),
-      ]);
-    });
-
-    expect(await repository.getTodayTotalCalories(now), 1050);
-  });
-
-  test('saves calories using grams and calories per 100g', () async {
-    await repository.logMeal(
-      foodName: 'Oats',
-      caloriesPer100g: 380,
-      grams: 50,
-      mealType: 'breakfast',
-    );
-
-    final entry = await database.select(database.mealEntries).getSingle();
-    expect(entry.calories, 190);
-    expect(entry.grams, 50);
-  });
-
-  test('rejects empty names and non-positive numbers', () async {
-    expect(
-      () => repository.logMeal(
-        foodName: '',
-        caloriesPer100g: 100,
-        grams: 50,
-        mealType: 'snack',
-      ),
-      throwsArgumentError,
-    );
-    expect(
-      () => repository.logMeal(
-        foodName: 'Apple',
-        caloriesPer100g: 0,
-        grams: 50,
-        mealType: 'snack',
-      ),
-      throwsArgumentError,
-    );
-    expect(
-      () => repository.logMeal(
-        foodName: 'Apple',
-        caloriesPer100g: 100,
-        grams: -1,
-        mealType: 'snack',
-      ),
-      throwsArgumentError,
-    );
-  });
-
-  test('reuses an existing food item by name', () async {
-    await repository.logMeal(
-      foodName: 'Apple',
-      caloriesPer100g: 52,
-      grams: 100,
-      mealType: 'snack',
-    );
-    await repository.logMeal(
-      foodName: 'Apple',
-      caloriesPer100g: 52,
+  test('daily totals are derived from entries and exclude other dates',
+      () async {
+    final egg = (await database.select(database.foods).get()).first;
+    await repository.addEntry(
+      foodId: egg.id,
       grams: 150,
-      mealType: 'snack',
+      mealSlot: 'breakfast',
+      loggedAt: DateTime(2026, 11, 12, 8),
     );
+    await repository.addEntry(
+      foodId: egg.id,
+      grams: 100,
+      mealSlot: 'snack',
+      loggedAt: DateTime(2026, 11, 11, 8),
+    );
+    final totals = await repository.getDailyTotals(DateTime(2026, 11, 12));
+    expect(totals.calories, 232.5);
+    expect(totals.protein, closeTo(18.9, 0.0001));
+  });
 
-    expect(await database.select(database.foodItems).get(), hasLength(1));
-    expect(await database.select(database.mealEntries).get(), hasLength(2));
+  test('editing grams updates totals', () async {
+    final egg = (await database.select(database.foods).get()).first;
+    await repository.addEntry(
+      foodId: egg.id,
+      grams: 100,
+      mealSlot: 'breakfast',
+      loggedAt: DateTime(2026, 11, 12),
+    );
+    final entry = await database.select(database.mealEntries).getSingle();
+    await repository.updateGrams(entry.id, 150);
+    expect(
+      (await repository.getDailyTotals(DateTime(2026, 11, 12))).calories,
+      232.5,
+    );
   });
 }

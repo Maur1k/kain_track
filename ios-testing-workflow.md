@@ -39,10 +39,10 @@ Develop on a Windows or Linux laptop, build the iOS app in the cloud, and instal
 - TestFlight or App Store distribution requires the Apple Developer Program ($99/year). Codemagic can sign and upload builds once enrolled.
 
 ## Setup Checklist
-- [ ] Flutter and Android Studio installed; `flutter doctor` passes
-- [ ] GitHub repo created and project pushed
-- [ ] Codemagic account connected to `Maur1k/kain_track`
-- [ ] Codemagic `ios-unsigned` workflow selected
-- [ ] Unsigned iOS `.ipa` build configured
-- [ ] Sideloadly installed
-- [ ] First build installed on iPhone XR
+- [y] Flutter and Android Studio installed; `flutter doctor` passes
+- [y] GitHub repo created and project pushed
+- [y] Codemagic account connected to `Maur1k/kain_track`
+- [y] Codemagic `ios-unsigned` workflow selected
+- [y] Unsigned iOS `.ipa` build configured
+- [y] Sideloadly installed
+- [y] First build installed on iPhone XR

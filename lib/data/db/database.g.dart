@@ -3,226 +3,11 @@
 part of 'database.dart';
 
 // ignore_for_file: type=lint
-class $MealsTable extends Meals with TableInfo<$MealsTable, Meal> {
+class $FoodsTable extends Foods with TableInfo<$FoodsTable, Food> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $MealsTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
-  static const VerificationMeta _loggedAtMeta =
-      const VerificationMeta('loggedAt');
-  @override
-  late final GeneratedColumn<DateTime> loggedAt = GeneratedColumn<DateTime>(
-      'logged_at', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
-  static const VerificationMeta _mealTypeMeta =
-      const VerificationMeta('mealType');
-  @override
-  late final GeneratedColumn<String> mealType = GeneratedColumn<String>(
-      'meal_type', aliasedName, false,
-      type: DriftSqlType.string,
-      requiredDuringInsert: false,
-      defaultValue: const Constant('snack'));
-  @override
-  List<GeneratedColumn> get $columns => [id, loggedAt, mealType];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'meals';
-  @override
-  VerificationContext validateIntegrity(Insertable<Meal> instance,
-      {bool isInserting = false}) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('logged_at')) {
-      context.handle(_loggedAtMeta,
-          loggedAt.isAcceptableOrUnknown(data['logged_at']!, _loggedAtMeta));
-    } else if (isInserting) {
-      context.missing(_loggedAtMeta);
-    }
-    if (data.containsKey('meal_type')) {
-      context.handle(_mealTypeMeta,
-          mealType.isAcceptableOrUnknown(data['meal_type']!, _mealTypeMeta));
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  Meal map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Meal(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      loggedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}logged_at'])!,
-      mealType: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}meal_type'])!,
-    );
-  }
-
-  @override
-  $MealsTable createAlias(String alias) {
-    return $MealsTable(attachedDatabase, alias);
-  }
-}
-
-class Meal extends DataClass implements Insertable<Meal> {
-  final int id;
-  final DateTime loggedAt;
-  final String mealType;
-  const Meal(
-      {required this.id, required this.loggedAt, required this.mealType});
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['logged_at'] = Variable<DateTime>(loggedAt);
-    map['meal_type'] = Variable<String>(mealType);
-    return map;
-  }
-
-  MealsCompanion toCompanion(bool nullToAbsent) {
-    return MealsCompanion(
-      id: Value(id),
-      loggedAt: Value(loggedAt),
-      mealType: Value(mealType),
-    );
-  }
-
-  factory Meal.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Meal(
-      id: serializer.fromJson<int>(json['id']),
-      loggedAt: serializer.fromJson<DateTime>(json['loggedAt']),
-      mealType: serializer.fromJson<String>(json['mealType']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'loggedAt': serializer.toJson<DateTime>(loggedAt),
-      'mealType': serializer.toJson<String>(mealType),
-    };
-  }
-
-  Meal copyWith({int? id, DateTime? loggedAt, String? mealType}) => Meal(
-        id: id ?? this.id,
-        loggedAt: loggedAt ?? this.loggedAt,
-        mealType: mealType ?? this.mealType,
-      );
-  Meal copyWithCompanion(MealsCompanion data) {
-    return Meal(
-      id: data.id.present ? data.id.value : this.id,
-      loggedAt: data.loggedAt.present ? data.loggedAt.value : this.loggedAt,
-      mealType: data.mealType.present ? data.mealType.value : this.mealType,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('Meal(')
-          ..write('id: $id, ')
-          ..write('loggedAt: $loggedAt, ')
-          ..write('mealType: $mealType')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(id, loggedAt, mealType);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is Meal &&
-          other.id == this.id &&
-          other.loggedAt == this.loggedAt &&
-          other.mealType == this.mealType);
-}
-
-class MealsCompanion extends UpdateCompanion<Meal> {
-  final Value<int> id;
-  final Value<DateTime> loggedAt;
-  final Value<String> mealType;
-  const MealsCompanion({
-    this.id = const Value.absent(),
-    this.loggedAt = const Value.absent(),
-    this.mealType = const Value.absent(),
-  });
-  MealsCompanion.insert({
-    this.id = const Value.absent(),
-    required DateTime loggedAt,
-    this.mealType = const Value.absent(),
-  }) : loggedAt = Value(loggedAt);
-  static Insertable<Meal> custom({
-    Expression<int>? id,
-    Expression<DateTime>? loggedAt,
-    Expression<String>? mealType,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (loggedAt != null) 'logged_at': loggedAt,
-      if (mealType != null) 'meal_type': mealType,
-    });
-  }
-
-  MealsCompanion copyWith(
-      {Value<int>? id, Value<DateTime>? loggedAt, Value<String>? mealType}) {
-    return MealsCompanion(
-      id: id ?? this.id,
-      loggedAt: loggedAt ?? this.loggedAt,
-      mealType: mealType ?? this.mealType,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<int>(id.value);
-    }
-    if (loggedAt.present) {
-      map['logged_at'] = Variable<DateTime>(loggedAt.value);
-    }
-    if (mealType.present) {
-      map['meal_type'] = Variable<String>(mealType.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('MealsCompanion(')
-          ..write('id: $id, ')
-          ..write('loggedAt: $loggedAt, ')
-          ..write('mealType: $mealType')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class $FoodItemsTable extends FoodItems
-    with TableInfo<$FoodItemsTable, FoodItem> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $FoodItemsTable(this.attachedDatabase, [this._alias]);
+  $FoodsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -236,22 +21,69 @@ class $FoodItemsTable extends FoodItems
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
       'name', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
   static const VerificationMeta _caloriesPer100gMeta =
       const VerificationMeta('caloriesPer100g');
   @override
   late final GeneratedColumn<double> caloriesPer100g = GeneratedColumn<double>(
       'calories_per100g', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _proteinPer100gMeta =
+      const VerificationMeta('proteinPer100g');
   @override
-  List<GeneratedColumn> get $columns => [id, name, caloriesPer100g];
+  late final GeneratedColumn<double> proteinPer100g = GeneratedColumn<double>(
+      'protein_per100g', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _carbsPer100gMeta =
+      const VerificationMeta('carbsPer100g');
+  @override
+  late final GeneratedColumn<double> carbsPer100g = GeneratedColumn<double>(
+      'carbs_per100g', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _fatPer100gMeta =
+      const VerificationMeta('fatPer100g');
+  @override
+  late final GeneratedColumn<double> fatPer100g = GeneratedColumn<double>(
+      'fat_per100g', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _categoryMeta =
+      const VerificationMeta('category');
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+      'category', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('Protein'));
+  static const VerificationMeta _isCustomMeta =
+      const VerificationMeta('isCustom');
+  @override
+  late final GeneratedColumn<bool> isCustom = GeneratedColumn<bool>(
+      'is_custom', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_custom" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        name,
+        caloriesPer100g,
+        proteinPer100g,
+        carbsPer100g,
+        fatPer100g,
+        category,
+        isCustom
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'food_items';
+  static const String $name = 'foods';
   @override
-  VerificationContext validateIntegrity(Insertable<FoodItem> instance,
+  VerificationContext validateIntegrity(Insertable<Food> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -272,60 +104,129 @@ class $FoodItemsTable extends FoodItems
     } else if (isInserting) {
       context.missing(_caloriesPer100gMeta);
     }
+    if (data.containsKey('protein_per100g')) {
+      context.handle(
+          _proteinPer100gMeta,
+          proteinPer100g.isAcceptableOrUnknown(
+              data['protein_per100g']!, _proteinPer100gMeta));
+    } else if (isInserting) {
+      context.missing(_proteinPer100gMeta);
+    }
+    if (data.containsKey('carbs_per100g')) {
+      context.handle(
+          _carbsPer100gMeta,
+          carbsPer100g.isAcceptableOrUnknown(
+              data['carbs_per100g']!, _carbsPer100gMeta));
+    } else if (isInserting) {
+      context.missing(_carbsPer100gMeta);
+    }
+    if (data.containsKey('fat_per100g')) {
+      context.handle(
+          _fatPer100gMeta,
+          fatPer100g.isAcceptableOrUnknown(
+              data['fat_per100g']!, _fatPer100gMeta));
+    } else if (isInserting) {
+      context.missing(_fatPer100gMeta);
+    }
+    if (data.containsKey('category')) {
+      context.handle(_categoryMeta,
+          category.isAcceptableOrUnknown(data['category']!, _categoryMeta));
+    }
+    if (data.containsKey('is_custom')) {
+      context.handle(_isCustomMeta,
+          isCustom.isAcceptableOrUnknown(data['is_custom']!, _isCustomMeta));
+    }
     return context;
   }
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  FoodItem map(Map<String, dynamic> data, {String? tablePrefix}) {
+  Food map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return FoodItem(
+    return Food(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       caloriesPer100g: attachedDatabase.typeMapping.read(
           DriftSqlType.double, data['${effectivePrefix}calories_per100g'])!,
+      proteinPer100g: attachedDatabase.typeMapping.read(
+          DriftSqlType.double, data['${effectivePrefix}protein_per100g'])!,
+      carbsPer100g: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}carbs_per100g'])!,
+      fatPer100g: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}fat_per100g'])!,
+      category: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}category'])!,
+      isCustom: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_custom'])!,
     );
   }
 
   @override
-  $FoodItemsTable createAlias(String alias) {
-    return $FoodItemsTable(attachedDatabase, alias);
+  $FoodsTable createAlias(String alias) {
+    return $FoodsTable(attachedDatabase, alias);
   }
 }
 
-class FoodItem extends DataClass implements Insertable<FoodItem> {
+class Food extends DataClass implements Insertable<Food> {
   final int id;
   final String name;
   final double caloriesPer100g;
-  const FoodItem(
-      {required this.id, required this.name, required this.caloriesPer100g});
+  final double proteinPer100g;
+  final double carbsPer100g;
+  final double fatPer100g;
+  final String category;
+  final bool isCustom;
+  const Food(
+      {required this.id,
+      required this.name,
+      required this.caloriesPer100g,
+      required this.proteinPer100g,
+      required this.carbsPer100g,
+      required this.fatPer100g,
+      required this.category,
+      required this.isCustom});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
     map['calories_per100g'] = Variable<double>(caloriesPer100g);
+    map['protein_per100g'] = Variable<double>(proteinPer100g);
+    map['carbs_per100g'] = Variable<double>(carbsPer100g);
+    map['fat_per100g'] = Variable<double>(fatPer100g);
+    map['category'] = Variable<String>(category);
+    map['is_custom'] = Variable<bool>(isCustom);
     return map;
   }
 
-  FoodItemsCompanion toCompanion(bool nullToAbsent) {
-    return FoodItemsCompanion(
+  FoodsCompanion toCompanion(bool nullToAbsent) {
+    return FoodsCompanion(
       id: Value(id),
       name: Value(name),
       caloriesPer100g: Value(caloriesPer100g),
+      proteinPer100g: Value(proteinPer100g),
+      carbsPer100g: Value(carbsPer100g),
+      fatPer100g: Value(fatPer100g),
+      category: Value(category),
+      isCustom: Value(isCustom),
     );
   }
 
-  factory FoodItem.fromJson(Map<String, dynamic> json,
+  factory Food.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return FoodItem(
+    return Food(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       caloriesPer100g: serializer.fromJson<double>(json['caloriesPer100g']),
+      proteinPer100g: serializer.fromJson<double>(json['proteinPer100g']),
+      carbsPer100g: serializer.fromJson<double>(json['carbsPer100g']),
+      fatPer100g: serializer.fromJson<double>(json['fatPer100g']),
+      category: serializer.fromJson<String>(json['category']),
+      isCustom: serializer.fromJson<bool>(json['isCustom']),
     );
   }
   @override
@@ -335,79 +236,158 @@ class FoodItem extends DataClass implements Insertable<FoodItem> {
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
       'caloriesPer100g': serializer.toJson<double>(caloriesPer100g),
+      'proteinPer100g': serializer.toJson<double>(proteinPer100g),
+      'carbsPer100g': serializer.toJson<double>(carbsPer100g),
+      'fatPer100g': serializer.toJson<double>(fatPer100g),
+      'category': serializer.toJson<String>(category),
+      'isCustom': serializer.toJson<bool>(isCustom),
     };
   }
 
-  FoodItem copyWith({int? id, String? name, double? caloriesPer100g}) =>
-      FoodItem(
+  Food copyWith(
+          {int? id,
+          String? name,
+          double? caloriesPer100g,
+          double? proteinPer100g,
+          double? carbsPer100g,
+          double? fatPer100g,
+          String? category,
+          bool? isCustom}) =>
+      Food(
         id: id ?? this.id,
         name: name ?? this.name,
         caloriesPer100g: caloriesPer100g ?? this.caloriesPer100g,
+        proteinPer100g: proteinPer100g ?? this.proteinPer100g,
+        carbsPer100g: carbsPer100g ?? this.carbsPer100g,
+        fatPer100g: fatPer100g ?? this.fatPer100g,
+        category: category ?? this.category,
+        isCustom: isCustom ?? this.isCustom,
       );
-  FoodItem copyWithCompanion(FoodItemsCompanion data) {
-    return FoodItem(
+  Food copyWithCompanion(FoodsCompanion data) {
+    return Food(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       caloriesPer100g: data.caloriesPer100g.present
           ? data.caloriesPer100g.value
           : this.caloriesPer100g,
+      proteinPer100g: data.proteinPer100g.present
+          ? data.proteinPer100g.value
+          : this.proteinPer100g,
+      carbsPer100g: data.carbsPer100g.present
+          ? data.carbsPer100g.value
+          : this.carbsPer100g,
+      fatPer100g:
+          data.fatPer100g.present ? data.fatPer100g.value : this.fatPer100g,
+      category: data.category.present ? data.category.value : this.category,
+      isCustom: data.isCustom.present ? data.isCustom.value : this.isCustom,
     );
   }
 
   @override
   String toString() {
-    return (StringBuffer('FoodItem(')
+    return (StringBuffer('Food(')
           ..write('id: $id, ')
           ..write('name: $name, ')
-          ..write('caloriesPer100g: $caloriesPer100g')
+          ..write('caloriesPer100g: $caloriesPer100g, ')
+          ..write('proteinPer100g: $proteinPer100g, ')
+          ..write('carbsPer100g: $carbsPer100g, ')
+          ..write('fatPer100g: $fatPer100g, ')
+          ..write('category: $category, ')
+          ..write('isCustom: $isCustom')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, caloriesPer100g);
+  int get hashCode => Object.hash(id, name, caloriesPer100g, proteinPer100g,
+      carbsPer100g, fatPer100g, category, isCustom);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is FoodItem &&
+      (other is Food &&
           other.id == this.id &&
           other.name == this.name &&
-          other.caloriesPer100g == this.caloriesPer100g);
+          other.caloriesPer100g == this.caloriesPer100g &&
+          other.proteinPer100g == this.proteinPer100g &&
+          other.carbsPer100g == this.carbsPer100g &&
+          other.fatPer100g == this.fatPer100g &&
+          other.category == this.category &&
+          other.isCustom == this.isCustom);
 }
 
-class FoodItemsCompanion extends UpdateCompanion<FoodItem> {
+class FoodsCompanion extends UpdateCompanion<Food> {
   final Value<int> id;
   final Value<String> name;
   final Value<double> caloriesPer100g;
-  const FoodItemsCompanion({
+  final Value<double> proteinPer100g;
+  final Value<double> carbsPer100g;
+  final Value<double> fatPer100g;
+  final Value<String> category;
+  final Value<bool> isCustom;
+  const FoodsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.caloriesPer100g = const Value.absent(),
+    this.proteinPer100g = const Value.absent(),
+    this.carbsPer100g = const Value.absent(),
+    this.fatPer100g = const Value.absent(),
+    this.category = const Value.absent(),
+    this.isCustom = const Value.absent(),
   });
-  FoodItemsCompanion.insert({
+  FoodsCompanion.insert({
     this.id = const Value.absent(),
     required String name,
     required double caloriesPer100g,
+    required double proteinPer100g,
+    required double carbsPer100g,
+    required double fatPer100g,
+    this.category = const Value.absent(),
+    this.isCustom = const Value.absent(),
   })  : name = Value(name),
-        caloriesPer100g = Value(caloriesPer100g);
-  static Insertable<FoodItem> custom({
+        caloriesPer100g = Value(caloriesPer100g),
+        proteinPer100g = Value(proteinPer100g),
+        carbsPer100g = Value(carbsPer100g),
+        fatPer100g = Value(fatPer100g);
+  static Insertable<Food> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<double>? caloriesPer100g,
+    Expression<double>? proteinPer100g,
+    Expression<double>? carbsPer100g,
+    Expression<double>? fatPer100g,
+    Expression<String>? category,
+    Expression<bool>? isCustom,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (caloriesPer100g != null) 'calories_per100g': caloriesPer100g,
+      if (proteinPer100g != null) 'protein_per100g': proteinPer100g,
+      if (carbsPer100g != null) 'carbs_per100g': carbsPer100g,
+      if (fatPer100g != null) 'fat_per100g': fatPer100g,
+      if (category != null) 'category': category,
+      if (isCustom != null) 'is_custom': isCustom,
     });
   }
 
-  FoodItemsCompanion copyWith(
-      {Value<int>? id, Value<String>? name, Value<double>? caloriesPer100g}) {
-    return FoodItemsCompanion(
+  FoodsCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? name,
+      Value<double>? caloriesPer100g,
+      Value<double>? proteinPer100g,
+      Value<double>? carbsPer100g,
+      Value<double>? fatPer100g,
+      Value<String>? category,
+      Value<bool>? isCustom}) {
+    return FoodsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       caloriesPer100g: caloriesPer100g ?? this.caloriesPer100g,
+      proteinPer100g: proteinPer100g ?? this.proteinPer100g,
+      carbsPer100g: carbsPer100g ?? this.carbsPer100g,
+      fatPer100g: fatPer100g ?? this.fatPer100g,
+      category: category ?? this.category,
+      isCustom: isCustom ?? this.isCustom,
     );
   }
 
@@ -423,15 +403,35 @@ class FoodItemsCompanion extends UpdateCompanion<FoodItem> {
     if (caloriesPer100g.present) {
       map['calories_per100g'] = Variable<double>(caloriesPer100g.value);
     }
+    if (proteinPer100g.present) {
+      map['protein_per100g'] = Variable<double>(proteinPer100g.value);
+    }
+    if (carbsPer100g.present) {
+      map['carbs_per100g'] = Variable<double>(carbsPer100g.value);
+    }
+    if (fatPer100g.present) {
+      map['fat_per100g'] = Variable<double>(fatPer100g.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    if (isCustom.present) {
+      map['is_custom'] = Variable<bool>(isCustom.value);
+    }
     return map;
   }
 
   @override
   String toString() {
-    return (StringBuffer('FoodItemsCompanion(')
+    return (StringBuffer('FoodsCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
-          ..write('caloriesPer100g: $caloriesPer100g')
+          ..write('caloriesPer100g: $caloriesPer100g, ')
+          ..write('proteinPer100g: $proteinPer100g, ')
+          ..write('carbsPer100g: $carbsPer100g, ')
+          ..write('fatPer100g: $fatPer100g, ')
+          ..write('category: $category, ')
+          ..write('isCustom: $isCustom')
           ..write(')'))
         .toString();
   }
@@ -452,40 +452,33 @@ class $MealEntriesTable extends MealEntries
       requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
-  static const VerificationMeta _mealIdMeta = const VerificationMeta('mealId');
+  static const VerificationMeta _foodIdMeta = const VerificationMeta('foodId');
   @override
-  late final GeneratedColumn<int> mealId = GeneratedColumn<int>(
-      'meal_id', aliasedName, false,
+  late final GeneratedColumn<int> foodId = GeneratedColumn<int>(
+      'food_id', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: true,
       defaultConstraints:
-          GeneratedColumn.constraintIsAlways('REFERENCES meals (id)'));
-  static const VerificationMeta _foodItemIdMeta =
-      const VerificationMeta('foodItemId');
-  @override
-  late final GeneratedColumn<int> foodItemId = GeneratedColumn<int>(
-      'food_item_id', aliasedName, false,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('REFERENCES food_items (id)'),
-      defaultValue: const Constant(1));
+          GeneratedColumn.constraintIsAlways('REFERENCES foods (id)'));
   static const VerificationMeta _gramsMeta = const VerificationMeta('grams');
   @override
   late final GeneratedColumn<double> grams = GeneratedColumn<double>(
       'grams', aliasedName, false,
-      type: DriftSqlType.double,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(0.0));
-  static const VerificationMeta _caloriesMeta =
-      const VerificationMeta('calories');
-  @override
-  late final GeneratedColumn<double> calories = GeneratedColumn<double>(
-      'calories', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _mealSlotMeta =
+      const VerificationMeta('mealSlot');
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, mealId, foodItemId, grams, calories];
+  late final GeneratedColumn<String> mealSlot = GeneratedColumn<String>(
+      'meal_slot', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _loggedAtMeta =
+      const VerificationMeta('loggedAt');
+  @override
+  late final GeneratedColumn<DateTime> loggedAt = GeneratedColumn<DateTime>(
+      'logged_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [id, foodId, grams, mealSlot, loggedAt];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -499,27 +492,29 @@ class $MealEntriesTable extends MealEntries
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
-    if (data.containsKey('meal_id')) {
-      context.handle(_mealIdMeta,
-          mealId.isAcceptableOrUnknown(data['meal_id']!, _mealIdMeta));
+    if (data.containsKey('food_id')) {
+      context.handle(_foodIdMeta,
+          foodId.isAcceptableOrUnknown(data['food_id']!, _foodIdMeta));
     } else if (isInserting) {
-      context.missing(_mealIdMeta);
-    }
-    if (data.containsKey('food_item_id')) {
-      context.handle(
-          _foodItemIdMeta,
-          foodItemId.isAcceptableOrUnknown(
-              data['food_item_id']!, _foodItemIdMeta));
+      context.missing(_foodIdMeta);
     }
     if (data.containsKey('grams')) {
       context.handle(
           _gramsMeta, grams.isAcceptableOrUnknown(data['grams']!, _gramsMeta));
-    }
-    if (data.containsKey('calories')) {
-      context.handle(_caloriesMeta,
-          calories.isAcceptableOrUnknown(data['calories']!, _caloriesMeta));
     } else if (isInserting) {
-      context.missing(_caloriesMeta);
+      context.missing(_gramsMeta);
+    }
+    if (data.containsKey('meal_slot')) {
+      context.handle(_mealSlotMeta,
+          mealSlot.isAcceptableOrUnknown(data['meal_slot']!, _mealSlotMeta));
+    } else if (isInserting) {
+      context.missing(_mealSlotMeta);
+    }
+    if (data.containsKey('logged_at')) {
+      context.handle(_loggedAtMeta,
+          loggedAt.isAcceptableOrUnknown(data['logged_at']!, _loggedAtMeta));
+    } else if (isInserting) {
+      context.missing(_loggedAtMeta);
     }
     return context;
   }
@@ -532,14 +527,14 @@ class $MealEntriesTable extends MealEntries
     return MealEntry(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      mealId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}meal_id'])!,
-      foodItemId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}food_item_id'])!,
+      foodId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}food_id'])!,
       grams: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}grams'])!,
-      calories: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}calories'])!,
+      mealSlot: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}meal_slot'])!,
+      loggedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}logged_at'])!,
     );
   }
 
@@ -551,34 +546,34 @@ class $MealEntriesTable extends MealEntries
 
 class MealEntry extends DataClass implements Insertable<MealEntry> {
   final int id;
-  final int mealId;
-  final int foodItemId;
+  final int foodId;
   final double grams;
-  final double calories;
+  final String mealSlot;
+  final DateTime loggedAt;
   const MealEntry(
       {required this.id,
-      required this.mealId,
-      required this.foodItemId,
+      required this.foodId,
       required this.grams,
-      required this.calories});
+      required this.mealSlot,
+      required this.loggedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['meal_id'] = Variable<int>(mealId);
-    map['food_item_id'] = Variable<int>(foodItemId);
+    map['food_id'] = Variable<int>(foodId);
     map['grams'] = Variable<double>(grams);
-    map['calories'] = Variable<double>(calories);
+    map['meal_slot'] = Variable<String>(mealSlot);
+    map['logged_at'] = Variable<DateTime>(loggedAt);
     return map;
   }
 
   MealEntriesCompanion toCompanion(bool nullToAbsent) {
     return MealEntriesCompanion(
       id: Value(id),
-      mealId: Value(mealId),
-      foodItemId: Value(foodItemId),
+      foodId: Value(foodId),
       grams: Value(grams),
-      calories: Value(calories),
+      mealSlot: Value(mealSlot),
+      loggedAt: Value(loggedAt),
     );
   }
 
@@ -587,10 +582,10 @@ class MealEntry extends DataClass implements Insertable<MealEntry> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return MealEntry(
       id: serializer.fromJson<int>(json['id']),
-      mealId: serializer.fromJson<int>(json['mealId']),
-      foodItemId: serializer.fromJson<int>(json['foodItemId']),
+      foodId: serializer.fromJson<int>(json['foodId']),
       grams: serializer.fromJson<double>(json['grams']),
-      calories: serializer.fromJson<double>(json['calories']),
+      mealSlot: serializer.fromJson<String>(json['mealSlot']),
+      loggedAt: serializer.fromJson<DateTime>(json['loggedAt']),
     );
   }
   @override
@@ -598,34 +593,33 @@ class MealEntry extends DataClass implements Insertable<MealEntry> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'mealId': serializer.toJson<int>(mealId),
-      'foodItemId': serializer.toJson<int>(foodItemId),
+      'foodId': serializer.toJson<int>(foodId),
       'grams': serializer.toJson<double>(grams),
-      'calories': serializer.toJson<double>(calories),
+      'mealSlot': serializer.toJson<String>(mealSlot),
+      'loggedAt': serializer.toJson<DateTime>(loggedAt),
     };
   }
 
   MealEntry copyWith(
           {int? id,
-          int? mealId,
-          int? foodItemId,
+          int? foodId,
           double? grams,
-          double? calories}) =>
+          String? mealSlot,
+          DateTime? loggedAt}) =>
       MealEntry(
         id: id ?? this.id,
-        mealId: mealId ?? this.mealId,
-        foodItemId: foodItemId ?? this.foodItemId,
+        foodId: foodId ?? this.foodId,
         grams: grams ?? this.grams,
-        calories: calories ?? this.calories,
+        mealSlot: mealSlot ?? this.mealSlot,
+        loggedAt: loggedAt ?? this.loggedAt,
       );
   MealEntry copyWithCompanion(MealEntriesCompanion data) {
     return MealEntry(
       id: data.id.present ? data.id.value : this.id,
-      mealId: data.mealId.present ? data.mealId.value : this.mealId,
-      foodItemId:
-          data.foodItemId.present ? data.foodItemId.value : this.foodItemId,
+      foodId: data.foodId.present ? data.foodId.value : this.foodId,
       grams: data.grams.present ? data.grams.value : this.grams,
-      calories: data.calories.present ? data.calories.value : this.calories,
+      mealSlot: data.mealSlot.present ? data.mealSlot.value : this.mealSlot,
+      loggedAt: data.loggedAt.present ? data.loggedAt.value : this.loggedAt,
     );
   }
 
@@ -633,76 +627,78 @@ class MealEntry extends DataClass implements Insertable<MealEntry> {
   String toString() {
     return (StringBuffer('MealEntry(')
           ..write('id: $id, ')
-          ..write('mealId: $mealId, ')
-          ..write('foodItemId: $foodItemId, ')
+          ..write('foodId: $foodId, ')
           ..write('grams: $grams, ')
-          ..write('calories: $calories')
+          ..write('mealSlot: $mealSlot, ')
+          ..write('loggedAt: $loggedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, mealId, foodItemId, grams, calories);
+  int get hashCode => Object.hash(id, foodId, grams, mealSlot, loggedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is MealEntry &&
           other.id == this.id &&
-          other.mealId == this.mealId &&
-          other.foodItemId == this.foodItemId &&
+          other.foodId == this.foodId &&
           other.grams == this.grams &&
-          other.calories == this.calories);
+          other.mealSlot == this.mealSlot &&
+          other.loggedAt == this.loggedAt);
 }
 
 class MealEntriesCompanion extends UpdateCompanion<MealEntry> {
   final Value<int> id;
-  final Value<int> mealId;
-  final Value<int> foodItemId;
+  final Value<int> foodId;
   final Value<double> grams;
-  final Value<double> calories;
+  final Value<String> mealSlot;
+  final Value<DateTime> loggedAt;
   const MealEntriesCompanion({
     this.id = const Value.absent(),
-    this.mealId = const Value.absent(),
-    this.foodItemId = const Value.absent(),
+    this.foodId = const Value.absent(),
     this.grams = const Value.absent(),
-    this.calories = const Value.absent(),
+    this.mealSlot = const Value.absent(),
+    this.loggedAt = const Value.absent(),
   });
   MealEntriesCompanion.insert({
     this.id = const Value.absent(),
-    required int mealId,
-    this.foodItemId = const Value.absent(),
-    this.grams = const Value.absent(),
-    required double calories,
-  })  : mealId = Value(mealId),
-        calories = Value(calories);
+    required int foodId,
+    required double grams,
+    required String mealSlot,
+    required DateTime loggedAt,
+  })  : foodId = Value(foodId),
+        grams = Value(grams),
+        mealSlot = Value(mealSlot),
+        loggedAt = Value(loggedAt);
   static Insertable<MealEntry> custom({
     Expression<int>? id,
-    Expression<int>? mealId,
-    Expression<int>? foodItemId,
+    Expression<int>? foodId,
     Expression<double>? grams,
-    Expression<double>? calories,
+    Expression<String>? mealSlot,
+    Expression<DateTime>? loggedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (mealId != null) 'meal_id': mealId,
-      if (foodItemId != null) 'food_item_id': foodItemId,
+      if (foodId != null) 'food_id': foodId,
       if (grams != null) 'grams': grams,
-      if (calories != null) 'calories': calories,
+      if (mealSlot != null) 'meal_slot': mealSlot,
+      if (loggedAt != null) 'logged_at': loggedAt,
     });
   }
 
   MealEntriesCompanion copyWith(
       {Value<int>? id,
-      Value<int>? mealId,
-      Value<int>? foodItemId,
+      Value<int>? foodId,
       Value<double>? grams,
-      Value<double>? calories}) {
+      Value<String>? mealSlot,
+      Value<DateTime>? loggedAt}) {
     return MealEntriesCompanion(
       id: id ?? this.id,
-      mealId: mealId ?? this.mealId,
-      foodItemId: foodItemId ?? this.foodItemId,
+      foodId: foodId ?? this.foodId,
       grams: grams ?? this.grams,
-      calories: calories ?? this.calories,
+      mealSlot: mealSlot ?? this.mealSlot,
+      loggedAt: loggedAt ?? this.loggedAt,
     );
   }
 
@@ -712,17 +708,17 @@ class MealEntriesCompanion extends UpdateCompanion<MealEntry> {
     if (id.present) {
       map['id'] = Variable<int>(id.value);
     }
-    if (mealId.present) {
-      map['meal_id'] = Variable<int>(mealId.value);
-    }
-    if (foodItemId.present) {
-      map['food_item_id'] = Variable<int>(foodItemId.value);
+    if (foodId.present) {
+      map['food_id'] = Variable<int>(foodId.value);
     }
     if (grams.present) {
       map['grams'] = Variable<double>(grams.value);
     }
-    if (calories.present) {
-      map['calories'] = Variable<double>(calories.value);
+    if (mealSlot.present) {
+      map['meal_slot'] = Variable<String>(mealSlot.value);
+    }
+    if (loggedAt.present) {
+      map['logged_at'] = Variable<DateTime>(loggedAt.value);
     }
     return map;
   }
@@ -731,21 +727,21 @@ class MealEntriesCompanion extends UpdateCompanion<MealEntry> {
   String toString() {
     return (StringBuffer('MealEntriesCompanion(')
           ..write('id: $id, ')
-          ..write('mealId: $mealId, ')
-          ..write('foodItemId: $foodItemId, ')
+          ..write('foodId: $foodId, ')
           ..write('grams: $grams, ')
-          ..write('calories: $calories')
+          ..write('mealSlot: $mealSlot, ')
+          ..write('loggedAt: $loggedAt')
           ..write(')'))
         .toString();
   }
 }
 
-class $ExercisesTable extends Exercises
-    with TableInfo<$ExercisesTable, Exercise> {
+class $WorkoutSessionsTable extends WorkoutSessions
+    with TableInfo<$WorkoutSessionsTable, WorkoutSession> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $ExercisesTable(this.attachedDatabase, [this._alias]);
+  $WorkoutSessionsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -760,15 +756,33 @@ class $ExercisesTable extends Exercises
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
       'name', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _durationMinutesMeta =
+      const VerificationMeta('durationMinutes');
   @override
-  List<GeneratedColumn> get $columns => [id, name];
+  late final GeneratedColumn<int> durationMinutes = GeneratedColumn<int>(
+      'duration_minutes', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+      'notes', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _performedAtMeta =
+      const VerificationMeta('performedAt');
+  @override
+  late final GeneratedColumn<DateTime> performedAt = GeneratedColumn<DateTime>(
+      'performed_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, name, durationMinutes, notes, performedAt];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'exercises';
+  static const String $name = 'workout_sessions';
   @override
-  VerificationContext validateIntegrity(Insertable<Exercise> instance,
+  VerificationContext validateIntegrity(Insertable<WorkoutSession> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -781,53 +795,101 @@ class $ExercisesTable extends Exercises
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
+    if (data.containsKey('duration_minutes')) {
+      context.handle(
+          _durationMinutesMeta,
+          durationMinutes.isAcceptableOrUnknown(
+              data['duration_minutes']!, _durationMinutesMeta));
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+          _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
+    }
+    if (data.containsKey('performed_at')) {
+      context.handle(
+          _performedAtMeta,
+          performedAt.isAcceptableOrUnknown(
+              data['performed_at']!, _performedAtMeta));
+    } else if (isInserting) {
+      context.missing(_performedAtMeta);
+    }
     return context;
   }
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Exercise map(Map<String, dynamic> data, {String? tablePrefix}) {
+  WorkoutSession map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Exercise(
+    return WorkoutSession(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      durationMinutes: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}duration_minutes']),
+      notes: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}notes']),
+      performedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}performed_at'])!,
     );
   }
 
   @override
-  $ExercisesTable createAlias(String alias) {
-    return $ExercisesTable(attachedDatabase, alias);
+  $WorkoutSessionsTable createAlias(String alias) {
+    return $WorkoutSessionsTable(attachedDatabase, alias);
   }
 }
 
-class Exercise extends DataClass implements Insertable<Exercise> {
+class WorkoutSession extends DataClass implements Insertable<WorkoutSession> {
   final int id;
   final String name;
-  const Exercise({required this.id, required this.name});
+  final int? durationMinutes;
+  final String? notes;
+  final DateTime performedAt;
+  const WorkoutSession(
+      {required this.id,
+      required this.name,
+      this.durationMinutes,
+      this.notes,
+      required this.performedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
+    if (!nullToAbsent || durationMinutes != null) {
+      map['duration_minutes'] = Variable<int>(durationMinutes);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['performed_at'] = Variable<DateTime>(performedAt);
     return map;
   }
 
-  ExercisesCompanion toCompanion(bool nullToAbsent) {
-    return ExercisesCompanion(
+  WorkoutSessionsCompanion toCompanion(bool nullToAbsent) {
+    return WorkoutSessionsCompanion(
       id: Value(id),
       name: Value(name),
+      durationMinutes: durationMinutes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(durationMinutes),
+      notes:
+          notes == null && nullToAbsent ? const Value.absent() : Value(notes),
+      performedAt: Value(performedAt),
     );
   }
 
-  factory Exercise.fromJson(Map<String, dynamic> json,
+  factory WorkoutSession.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Exercise(
+    return WorkoutSession(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
+      durationMinutes: serializer.fromJson<int?>(json['durationMinutes']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      performedAt: serializer.fromJson<DateTime>(json['performedAt']),
     );
   }
   @override
@@ -836,62 +898,115 @@ class Exercise extends DataClass implements Insertable<Exercise> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
+      'durationMinutes': serializer.toJson<int?>(durationMinutes),
+      'notes': serializer.toJson<String?>(notes),
+      'performedAt': serializer.toJson<DateTime>(performedAt),
     };
   }
 
-  Exercise copyWith({int? id, String? name}) => Exercise(
+  WorkoutSession copyWith(
+          {int? id,
+          String? name,
+          Value<int?> durationMinutes = const Value.absent(),
+          Value<String?> notes = const Value.absent(),
+          DateTime? performedAt}) =>
+      WorkoutSession(
         id: id ?? this.id,
         name: name ?? this.name,
+        durationMinutes: durationMinutes.present
+            ? durationMinutes.value
+            : this.durationMinutes,
+        notes: notes.present ? notes.value : this.notes,
+        performedAt: performedAt ?? this.performedAt,
       );
-  Exercise copyWithCompanion(ExercisesCompanion data) {
-    return Exercise(
+  WorkoutSession copyWithCompanion(WorkoutSessionsCompanion data) {
+    return WorkoutSession(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
+      durationMinutes: data.durationMinutes.present
+          ? data.durationMinutes.value
+          : this.durationMinutes,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      performedAt:
+          data.performedAt.present ? data.performedAt.value : this.performedAt,
     );
   }
 
   @override
   String toString() {
-    return (StringBuffer('Exercise(')
+    return (StringBuffer('WorkoutSession(')
           ..write('id: $id, ')
-          ..write('name: $name')
+          ..write('name: $name, ')
+          ..write('durationMinutes: $durationMinutes, ')
+          ..write('notes: $notes, ')
+          ..write('performedAt: $performedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name);
+  int get hashCode =>
+      Object.hash(id, name, durationMinutes, notes, performedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Exercise && other.id == this.id && other.name == this.name);
+      (other is WorkoutSession &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.durationMinutes == this.durationMinutes &&
+          other.notes == this.notes &&
+          other.performedAt == this.performedAt);
 }
 
-class ExercisesCompanion extends UpdateCompanion<Exercise> {
+class WorkoutSessionsCompanion extends UpdateCompanion<WorkoutSession> {
   final Value<int> id;
   final Value<String> name;
-  const ExercisesCompanion({
+  final Value<int?> durationMinutes;
+  final Value<String?> notes;
+  final Value<DateTime> performedAt;
+  const WorkoutSessionsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
+    this.durationMinutes = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.performedAt = const Value.absent(),
   });
-  ExercisesCompanion.insert({
+  WorkoutSessionsCompanion.insert({
     this.id = const Value.absent(),
     required String name,
-  }) : name = Value(name);
-  static Insertable<Exercise> custom({
+    this.durationMinutes = const Value.absent(),
+    this.notes = const Value.absent(),
+    required DateTime performedAt,
+  })  : name = Value(name),
+        performedAt = Value(performedAt);
+  static Insertable<WorkoutSession> custom({
     Expression<int>? id,
     Expression<String>? name,
+    Expression<int>? durationMinutes,
+    Expression<String>? notes,
+    Expression<DateTime>? performedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
+      if (durationMinutes != null) 'duration_minutes': durationMinutes,
+      if (notes != null) 'notes': notes,
+      if (performedAt != null) 'performed_at': performedAt,
     });
   }
 
-  ExercisesCompanion copyWith({Value<int>? id, Value<String>? name}) {
-    return ExercisesCompanion(
+  WorkoutSessionsCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? name,
+      Value<int?>? durationMinutes,
+      Value<String?>? notes,
+      Value<DateTime>? performedAt}) {
+    return WorkoutSessionsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
+      durationMinutes: durationMinutes ?? this.durationMinutes,
+      notes: notes ?? this.notes,
+      performedAt: performedAt ?? this.performedAt,
     );
   }
 
@@ -904,576 +1019,26 @@ class ExercisesCompanion extends UpdateCompanion<Exercise> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('ExercisesCompanion(')
-          ..write('id: $id, ')
-          ..write('name: $name')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class $WorkoutsTable extends Workouts with TableInfo<$WorkoutsTable, Workout> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $WorkoutsTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
-  static const VerificationMeta _startedAtMeta =
-      const VerificationMeta('startedAt');
-  @override
-  late final GeneratedColumn<DateTime> startedAt = GeneratedColumn<DateTime>(
-      'started_at', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
-  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
-  @override
-  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
-      'notes', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  @override
-  List<GeneratedColumn> get $columns => [id, startedAt, notes];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'workouts';
-  @override
-  VerificationContext validateIntegrity(Insertable<Workout> instance,
-      {bool isInserting = false}) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('started_at')) {
-      context.handle(_startedAtMeta,
-          startedAt.isAcceptableOrUnknown(data['started_at']!, _startedAtMeta));
-    } else if (isInserting) {
-      context.missing(_startedAtMeta);
-    }
-    if (data.containsKey('notes')) {
-      context.handle(
-          _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  Workout map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Workout(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      startedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}started_at'])!,
-      notes: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}notes']),
-    );
-  }
-
-  @override
-  $WorkoutsTable createAlias(String alias) {
-    return $WorkoutsTable(attachedDatabase, alias);
-  }
-}
-
-class Workout extends DataClass implements Insertable<Workout> {
-  final int id;
-  final DateTime startedAt;
-  final String? notes;
-  const Workout({required this.id, required this.startedAt, this.notes});
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['started_at'] = Variable<DateTime>(startedAt);
-    if (!nullToAbsent || notes != null) {
-      map['notes'] = Variable<String>(notes);
-    }
-    return map;
-  }
-
-  WorkoutsCompanion toCompanion(bool nullToAbsent) {
-    return WorkoutsCompanion(
-      id: Value(id),
-      startedAt: Value(startedAt),
-      notes:
-          notes == null && nullToAbsent ? const Value.absent() : Value(notes),
-    );
-  }
-
-  factory Workout.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Workout(
-      id: serializer.fromJson<int>(json['id']),
-      startedAt: serializer.fromJson<DateTime>(json['startedAt']),
-      notes: serializer.fromJson<String?>(json['notes']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'startedAt': serializer.toJson<DateTime>(startedAt),
-      'notes': serializer.toJson<String?>(notes),
-    };
-  }
-
-  Workout copyWith(
-          {int? id,
-          DateTime? startedAt,
-          Value<String?> notes = const Value.absent()}) =>
-      Workout(
-        id: id ?? this.id,
-        startedAt: startedAt ?? this.startedAt,
-        notes: notes.present ? notes.value : this.notes,
-      );
-  Workout copyWithCompanion(WorkoutsCompanion data) {
-    return Workout(
-      id: data.id.present ? data.id.value : this.id,
-      startedAt: data.startedAt.present ? data.startedAt.value : this.startedAt,
-      notes: data.notes.present ? data.notes.value : this.notes,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('Workout(')
-          ..write('id: $id, ')
-          ..write('startedAt: $startedAt, ')
-          ..write('notes: $notes')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(id, startedAt, notes);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is Workout &&
-          other.id == this.id &&
-          other.startedAt == this.startedAt &&
-          other.notes == this.notes);
-}
-
-class WorkoutsCompanion extends UpdateCompanion<Workout> {
-  final Value<int> id;
-  final Value<DateTime> startedAt;
-  final Value<String?> notes;
-  const WorkoutsCompanion({
-    this.id = const Value.absent(),
-    this.startedAt = const Value.absent(),
-    this.notes = const Value.absent(),
-  });
-  WorkoutsCompanion.insert({
-    this.id = const Value.absent(),
-    required DateTime startedAt,
-    this.notes = const Value.absent(),
-  }) : startedAt = Value(startedAt);
-  static Insertable<Workout> custom({
-    Expression<int>? id,
-    Expression<DateTime>? startedAt,
-    Expression<String>? notes,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (startedAt != null) 'started_at': startedAt,
-      if (notes != null) 'notes': notes,
-    });
-  }
-
-  WorkoutsCompanion copyWith(
-      {Value<int>? id, Value<DateTime>? startedAt, Value<String?>? notes}) {
-    return WorkoutsCompanion(
-      id: id ?? this.id,
-      startedAt: startedAt ?? this.startedAt,
-      notes: notes ?? this.notes,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<int>(id.value);
-    }
-    if (startedAt.present) {
-      map['started_at'] = Variable<DateTime>(startedAt.value);
+    if (durationMinutes.present) {
+      map['duration_minutes'] = Variable<int>(durationMinutes.value);
     }
     if (notes.present) {
       map['notes'] = Variable<String>(notes.value);
     }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('WorkoutsCompanion(')
-          ..write('id: $id, ')
-          ..write('startedAt: $startedAt, ')
-          ..write('notes: $notes')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class $WorkoutSetsTable extends WorkoutSets
-    with TableInfo<$WorkoutSetsTable, WorkoutSet> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $WorkoutSetsTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
-  static const VerificationMeta _workoutIdMeta =
-      const VerificationMeta('workoutId');
-  @override
-  late final GeneratedColumn<int> workoutId = GeneratedColumn<int>(
-      'workout_id', aliasedName, false,
-      type: DriftSqlType.int,
-      requiredDuringInsert: true,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('REFERENCES workouts (id)'));
-  static const VerificationMeta _exerciseIdMeta =
-      const VerificationMeta('exerciseId');
-  @override
-  late final GeneratedColumn<int> exerciseId = GeneratedColumn<int>(
-      'exercise_id', aliasedName, false,
-      type: DriftSqlType.int,
-      requiredDuringInsert: true,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('REFERENCES exercises (id)'));
-  static const VerificationMeta _setNumberMeta =
-      const VerificationMeta('setNumber');
-  @override
-  late final GeneratedColumn<int> setNumber = GeneratedColumn<int>(
-      'set_number', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _repsMeta = const VerificationMeta('reps');
-  @override
-  late final GeneratedColumn<int> reps = GeneratedColumn<int>(
-      'reps', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _weightKgMeta =
-      const VerificationMeta('weightKg');
-  @override
-  late final GeneratedColumn<double> weightKg = GeneratedColumn<double>(
-      'weight_kg', aliasedName, false,
-      type: DriftSqlType.double, requiredDuringInsert: true);
-  @override
-  List<GeneratedColumn> get $columns =>
-      [id, workoutId, exerciseId, setNumber, reps, weightKg];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'workout_sets';
-  @override
-  VerificationContext validateIntegrity(Insertable<WorkoutSet> instance,
-      {bool isInserting = false}) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('workout_id')) {
-      context.handle(_workoutIdMeta,
-          workoutId.isAcceptableOrUnknown(data['workout_id']!, _workoutIdMeta));
-    } else if (isInserting) {
-      context.missing(_workoutIdMeta);
-    }
-    if (data.containsKey('exercise_id')) {
-      context.handle(
-          _exerciseIdMeta,
-          exerciseId.isAcceptableOrUnknown(
-              data['exercise_id']!, _exerciseIdMeta));
-    } else if (isInserting) {
-      context.missing(_exerciseIdMeta);
-    }
-    if (data.containsKey('set_number')) {
-      context.handle(_setNumberMeta,
-          setNumber.isAcceptableOrUnknown(data['set_number']!, _setNumberMeta));
-    } else if (isInserting) {
-      context.missing(_setNumberMeta);
-    }
-    if (data.containsKey('reps')) {
-      context.handle(
-          _repsMeta, reps.isAcceptableOrUnknown(data['reps']!, _repsMeta));
-    } else if (isInserting) {
-      context.missing(_repsMeta);
-    }
-    if (data.containsKey('weight_kg')) {
-      context.handle(_weightKgMeta,
-          weightKg.isAcceptableOrUnknown(data['weight_kg']!, _weightKgMeta));
-    } else if (isInserting) {
-      context.missing(_weightKgMeta);
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  WorkoutSet map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return WorkoutSet(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      workoutId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}workout_id'])!,
-      exerciseId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}exercise_id'])!,
-      setNumber: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}set_number'])!,
-      reps: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}reps'])!,
-      weightKg: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}weight_kg'])!,
-    );
-  }
-
-  @override
-  $WorkoutSetsTable createAlias(String alias) {
-    return $WorkoutSetsTable(attachedDatabase, alias);
-  }
-}
-
-class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
-  final int id;
-  final int workoutId;
-  final int exerciseId;
-  final int setNumber;
-  final int reps;
-  final double weightKg;
-  const WorkoutSet(
-      {required this.id,
-      required this.workoutId,
-      required this.exerciseId,
-      required this.setNumber,
-      required this.reps,
-      required this.weightKg});
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['workout_id'] = Variable<int>(workoutId);
-    map['exercise_id'] = Variable<int>(exerciseId);
-    map['set_number'] = Variable<int>(setNumber);
-    map['reps'] = Variable<int>(reps);
-    map['weight_kg'] = Variable<double>(weightKg);
-    return map;
-  }
-
-  WorkoutSetsCompanion toCompanion(bool nullToAbsent) {
-    return WorkoutSetsCompanion(
-      id: Value(id),
-      workoutId: Value(workoutId),
-      exerciseId: Value(exerciseId),
-      setNumber: Value(setNumber),
-      reps: Value(reps),
-      weightKg: Value(weightKg),
-    );
-  }
-
-  factory WorkoutSet.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return WorkoutSet(
-      id: serializer.fromJson<int>(json['id']),
-      workoutId: serializer.fromJson<int>(json['workoutId']),
-      exerciseId: serializer.fromJson<int>(json['exerciseId']),
-      setNumber: serializer.fromJson<int>(json['setNumber']),
-      reps: serializer.fromJson<int>(json['reps']),
-      weightKg: serializer.fromJson<double>(json['weightKg']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'workoutId': serializer.toJson<int>(workoutId),
-      'exerciseId': serializer.toJson<int>(exerciseId),
-      'setNumber': serializer.toJson<int>(setNumber),
-      'reps': serializer.toJson<int>(reps),
-      'weightKg': serializer.toJson<double>(weightKg),
-    };
-  }
-
-  WorkoutSet copyWith(
-          {int? id,
-          int? workoutId,
-          int? exerciseId,
-          int? setNumber,
-          int? reps,
-          double? weightKg}) =>
-      WorkoutSet(
-        id: id ?? this.id,
-        workoutId: workoutId ?? this.workoutId,
-        exerciseId: exerciseId ?? this.exerciseId,
-        setNumber: setNumber ?? this.setNumber,
-        reps: reps ?? this.reps,
-        weightKg: weightKg ?? this.weightKg,
-      );
-  WorkoutSet copyWithCompanion(WorkoutSetsCompanion data) {
-    return WorkoutSet(
-      id: data.id.present ? data.id.value : this.id,
-      workoutId: data.workoutId.present ? data.workoutId.value : this.workoutId,
-      exerciseId:
-          data.exerciseId.present ? data.exerciseId.value : this.exerciseId,
-      setNumber: data.setNumber.present ? data.setNumber.value : this.setNumber,
-      reps: data.reps.present ? data.reps.value : this.reps,
-      weightKg: data.weightKg.present ? data.weightKg.value : this.weightKg,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('WorkoutSet(')
-          ..write('id: $id, ')
-          ..write('workoutId: $workoutId, ')
-          ..write('exerciseId: $exerciseId, ')
-          ..write('setNumber: $setNumber, ')
-          ..write('reps: $reps, ')
-          ..write('weightKg: $weightKg')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode =>
-      Object.hash(id, workoutId, exerciseId, setNumber, reps, weightKg);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is WorkoutSet &&
-          other.id == this.id &&
-          other.workoutId == this.workoutId &&
-          other.exerciseId == this.exerciseId &&
-          other.setNumber == this.setNumber &&
-          other.reps == this.reps &&
-          other.weightKg == this.weightKg);
-}
-
-class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
-  final Value<int> id;
-  final Value<int> workoutId;
-  final Value<int> exerciseId;
-  final Value<int> setNumber;
-  final Value<int> reps;
-  final Value<double> weightKg;
-  const WorkoutSetsCompanion({
-    this.id = const Value.absent(),
-    this.workoutId = const Value.absent(),
-    this.exerciseId = const Value.absent(),
-    this.setNumber = const Value.absent(),
-    this.reps = const Value.absent(),
-    this.weightKg = const Value.absent(),
-  });
-  WorkoutSetsCompanion.insert({
-    this.id = const Value.absent(),
-    required int workoutId,
-    required int exerciseId,
-    required int setNumber,
-    required int reps,
-    required double weightKg,
-  })  : workoutId = Value(workoutId),
-        exerciseId = Value(exerciseId),
-        setNumber = Value(setNumber),
-        reps = Value(reps),
-        weightKg = Value(weightKg);
-  static Insertable<WorkoutSet> custom({
-    Expression<int>? id,
-    Expression<int>? workoutId,
-    Expression<int>? exerciseId,
-    Expression<int>? setNumber,
-    Expression<int>? reps,
-    Expression<double>? weightKg,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (workoutId != null) 'workout_id': workoutId,
-      if (exerciseId != null) 'exercise_id': exerciseId,
-      if (setNumber != null) 'set_number': setNumber,
-      if (reps != null) 'reps': reps,
-      if (weightKg != null) 'weight_kg': weightKg,
-    });
-  }
-
-  WorkoutSetsCompanion copyWith(
-      {Value<int>? id,
-      Value<int>? workoutId,
-      Value<int>? exerciseId,
-      Value<int>? setNumber,
-      Value<int>? reps,
-      Value<double>? weightKg}) {
-    return WorkoutSetsCompanion(
-      id: id ?? this.id,
-      workoutId: workoutId ?? this.workoutId,
-      exerciseId: exerciseId ?? this.exerciseId,
-      setNumber: setNumber ?? this.setNumber,
-      reps: reps ?? this.reps,
-      weightKg: weightKg ?? this.weightKg,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<int>(id.value);
-    }
-    if (workoutId.present) {
-      map['workout_id'] = Variable<int>(workoutId.value);
-    }
-    if (exerciseId.present) {
-      map['exercise_id'] = Variable<int>(exerciseId.value);
-    }
-    if (setNumber.present) {
-      map['set_number'] = Variable<int>(setNumber.value);
-    }
-    if (reps.present) {
-      map['reps'] = Variable<int>(reps.value);
-    }
-    if (weightKg.present) {
-      map['weight_kg'] = Variable<double>(weightKg.value);
+    if (performedAt.present) {
+      map['performed_at'] = Variable<DateTime>(performedAt.value);
     }
     return map;
   }
 
   @override
   String toString() {
-    return (StringBuffer('WorkoutSetsCompanion(')
+    return (StringBuffer('WorkoutSessionsCompanion(')
           ..write('id: $id, ')
-          ..write('workoutId: $workoutId, ')
-          ..write('exerciseId: $exerciseId, ')
-          ..write('setNumber: $setNumber, ')
-          ..write('reps: $reps, ')
-          ..write('weightKg: $weightKg')
+          ..write('name: $name, ')
+          ..write('durationMinutes: $durationMinutes, ')
+          ..write('notes: $notes, ')
+          ..write('performedAt: $performedAt')
           ..write(')'))
         .toString();
   }
@@ -1482,256 +1047,51 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
-  late final $MealsTable meals = $MealsTable(this);
-  late final $FoodItemsTable foodItems = $FoodItemsTable(this);
+  late final $FoodsTable foods = $FoodsTable(this);
   late final $MealEntriesTable mealEntries = $MealEntriesTable(this);
-  late final $ExercisesTable exercises = $ExercisesTable(this);
-  late final $WorkoutsTable workouts = $WorkoutsTable(this);
-  late final $WorkoutSetsTable workoutSets = $WorkoutSetsTable(this);
+  late final $WorkoutSessionsTable workoutSessions =
+      $WorkoutSessionsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [meals, foodItems, mealEntries, exercises, workouts, workoutSets];
+      [foods, mealEntries, workoutSessions];
 }
 
-typedef $$MealsTableCreateCompanionBuilder = MealsCompanion Function({
-  Value<int> id,
-  required DateTime loggedAt,
-  Value<String> mealType,
-});
-typedef $$MealsTableUpdateCompanionBuilder = MealsCompanion Function({
-  Value<int> id,
-  Value<DateTime> loggedAt,
-  Value<String> mealType,
-});
-
-final class $$MealsTableReferences
-    extends BaseReferences<_$AppDatabase, $MealsTable, Meal> {
-  $$MealsTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static MultiTypedResultKey<$MealEntriesTable, List<MealEntry>>
-      _mealEntriesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-          db.mealEntries,
-          aliasName: $_aliasNameGenerator(db.meals.id, db.mealEntries.mealId));
-
-  $$MealEntriesTableProcessedTableManager get mealEntriesRefs {
-    final manager = $$MealEntriesTableTableManager($_db, $_db.mealEntries)
-        .filter((f) => f.mealId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_mealEntriesRefsTable($_db));
-    return ProcessedTableManager(
-        manager.$state.copyWith(prefetchedData: cache));
-  }
-}
-
-class $$MealsTableFilterComposer extends Composer<_$AppDatabase, $MealsTable> {
-  $$MealsTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<DateTime> get loggedAt => $composableBuilder(
-      column: $table.loggedAt, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get mealType => $composableBuilder(
-      column: $table.mealType, builder: (column) => ColumnFilters(column));
-
-  Expression<bool> mealEntriesRefs(
-      Expression<bool> Function($$MealEntriesTableFilterComposer f) f) {
-    final $$MealEntriesTableFilterComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.id,
-        referencedTable: $db.mealEntries,
-        getReferencedColumn: (t) => t.mealId,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$MealEntriesTableFilterComposer(
-              $db: $db,
-              $table: $db.mealEntries,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return f(composer);
-  }
-}
-
-class $$MealsTableOrderingComposer
-    extends Composer<_$AppDatabase, $MealsTable> {
-  $$MealsTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<DateTime> get loggedAt => $composableBuilder(
-      column: $table.loggedAt, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get mealType => $composableBuilder(
-      column: $table.mealType, builder: (column) => ColumnOrderings(column));
-}
-
-class $$MealsTableAnnotationComposer
-    extends Composer<_$AppDatabase, $MealsTable> {
-  $$MealsTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<int> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get loggedAt =>
-      $composableBuilder(column: $table.loggedAt, builder: (column) => column);
-
-  GeneratedColumn<String> get mealType =>
-      $composableBuilder(column: $table.mealType, builder: (column) => column);
-
-  Expression<T> mealEntriesRefs<T extends Object>(
-      Expression<T> Function($$MealEntriesTableAnnotationComposer a) f) {
-    final $$MealEntriesTableAnnotationComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.id,
-        referencedTable: $db.mealEntries,
-        getReferencedColumn: (t) => t.mealId,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$MealEntriesTableAnnotationComposer(
-              $db: $db,
-              $table: $db.mealEntries,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return f(composer);
-  }
-}
-
-class $$MealsTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $MealsTable,
-    Meal,
-    $$MealsTableFilterComposer,
-    $$MealsTableOrderingComposer,
-    $$MealsTableAnnotationComposer,
-    $$MealsTableCreateCompanionBuilder,
-    $$MealsTableUpdateCompanionBuilder,
-    (Meal, $$MealsTableReferences),
-    Meal,
-    PrefetchHooks Function({bool mealEntriesRefs})> {
-  $$MealsTableTableManager(_$AppDatabase db, $MealsTable table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$MealsTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$MealsTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$MealsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<DateTime> loggedAt = const Value.absent(),
-            Value<String> mealType = const Value.absent(),
-          }) =>
-              MealsCompanion(
-            id: id,
-            loggedAt: loggedAt,
-            mealType: mealType,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required DateTime loggedAt,
-            Value<String> mealType = const Value.absent(),
-          }) =>
-              MealsCompanion.insert(
-            id: id,
-            loggedAt: loggedAt,
-            mealType: mealType,
-          ),
-          withReferenceMapper: (p0) => p0
-              .map((e) =>
-                  (e.readTable(table), $$MealsTableReferences(db, table, e)))
-              .toList(),
-          prefetchHooksCallback: ({mealEntriesRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (mealEntriesRefs) db.mealEntries],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (mealEntriesRefs)
-                    await $_getPrefetchedData<Meal, $MealsTable, MealEntry>(
-                        currentTable: table,
-                        referencedTable:
-                            $$MealsTableReferences._mealEntriesRefsTable(db),
-                        managerFromTypedResult: (p0) =>
-                            $$MealsTableReferences(db, table, p0)
-                                .mealEntriesRefs,
-                        referencedItemsForCurrentItem: (item,
-                                referencedItems) =>
-                            referencedItems.where((e) => e.mealId == item.id),
-                        typedResults: items)
-                ];
-              },
-            );
-          },
-        ));
-}
-
-typedef $$MealsTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $MealsTable,
-    Meal,
-    $$MealsTableFilterComposer,
-    $$MealsTableOrderingComposer,
-    $$MealsTableAnnotationComposer,
-    $$MealsTableCreateCompanionBuilder,
-    $$MealsTableUpdateCompanionBuilder,
-    (Meal, $$MealsTableReferences),
-    Meal,
-    PrefetchHooks Function({bool mealEntriesRefs})>;
-typedef $$FoodItemsTableCreateCompanionBuilder = FoodItemsCompanion Function({
+typedef $$FoodsTableCreateCompanionBuilder = FoodsCompanion Function({
   Value<int> id,
   required String name,
   required double caloriesPer100g,
+  required double proteinPer100g,
+  required double carbsPer100g,
+  required double fatPer100g,
+  Value<String> category,
+  Value<bool> isCustom,
 });
-typedef $$FoodItemsTableUpdateCompanionBuilder = FoodItemsCompanion Function({
+typedef $$FoodsTableUpdateCompanionBuilder = FoodsCompanion Function({
   Value<int> id,
   Value<String> name,
   Value<double> caloriesPer100g,
+  Value<double> proteinPer100g,
+  Value<double> carbsPer100g,
+  Value<double> fatPer100g,
+  Value<String> category,
+  Value<bool> isCustom,
 });
 
-final class $$FoodItemsTableReferences
-    extends BaseReferences<_$AppDatabase, $FoodItemsTable, FoodItem> {
-  $$FoodItemsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+final class $$FoodsTableReferences
+    extends BaseReferences<_$AppDatabase, $FoodsTable, Food> {
+  $$FoodsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static MultiTypedResultKey<$MealEntriesTable, List<MealEntry>>
       _mealEntriesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
           db.mealEntries,
-          aliasName:
-              $_aliasNameGenerator(db.foodItems.id, db.mealEntries.foodItemId));
+          aliasName: $_aliasNameGenerator(db.foods.id, db.mealEntries.foodId));
 
   $$MealEntriesTableProcessedTableManager get mealEntriesRefs {
     final manager = $$MealEntriesTableTableManager($_db, $_db.mealEntries)
-        .filter((f) => f.foodItemId.id.sqlEquals($_itemColumn<int>('id')!));
+        .filter((f) => f.foodId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_mealEntriesRefsTable($_db));
     return ProcessedTableManager(
@@ -1739,9 +1099,8 @@ final class $$FoodItemsTableReferences
   }
 }
 
-class $$FoodItemsTableFilterComposer
-    extends Composer<_$AppDatabase, $FoodItemsTable> {
-  $$FoodItemsTableFilterComposer({
+class $$FoodsTableFilterComposer extends Composer<_$AppDatabase, $FoodsTable> {
+  $$FoodsTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1758,13 +1117,29 @@ class $$FoodItemsTableFilterComposer
       column: $table.caloriesPer100g,
       builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<double> get proteinPer100g => $composableBuilder(
+      column: $table.proteinPer100g,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get carbsPer100g => $composableBuilder(
+      column: $table.carbsPer100g, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get fatPer100g => $composableBuilder(
+      column: $table.fatPer100g, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get category => $composableBuilder(
+      column: $table.category, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isCustom => $composableBuilder(
+      column: $table.isCustom, builder: (column) => ColumnFilters(column));
+
   Expression<bool> mealEntriesRefs(
       Expression<bool> Function($$MealEntriesTableFilterComposer f) f) {
     final $$MealEntriesTableFilterComposer composer = $composerBuilder(
         composer: this,
         getCurrentColumn: (t) => t.id,
         referencedTable: $db.mealEntries,
-        getReferencedColumn: (t) => t.foodItemId,
+        getReferencedColumn: (t) => t.foodId,
         builder: (joinBuilder,
                 {$addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer}) =>
@@ -1780,9 +1155,9 @@ class $$FoodItemsTableFilterComposer
   }
 }
 
-class $$FoodItemsTableOrderingComposer
-    extends Composer<_$AppDatabase, $FoodItemsTable> {
-  $$FoodItemsTableOrderingComposer({
+class $$FoodsTableOrderingComposer
+    extends Composer<_$AppDatabase, $FoodsTable> {
+  $$FoodsTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1798,11 +1173,28 @@ class $$FoodItemsTableOrderingComposer
   ColumnOrderings<double> get caloriesPer100g => $composableBuilder(
       column: $table.caloriesPer100g,
       builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get proteinPer100g => $composableBuilder(
+      column: $table.proteinPer100g,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get carbsPer100g => $composableBuilder(
+      column: $table.carbsPer100g,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get fatPer100g => $composableBuilder(
+      column: $table.fatPer100g, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get category => $composableBuilder(
+      column: $table.category, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isCustom => $composableBuilder(
+      column: $table.isCustom, builder: (column) => ColumnOrderings(column));
 }
 
-class $$FoodItemsTableAnnotationComposer
-    extends Composer<_$AppDatabase, $FoodItemsTable> {
-  $$FoodItemsTableAnnotationComposer({
+class $$FoodsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FoodsTable> {
+  $$FoodsTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1818,13 +1210,28 @@ class $$FoodItemsTableAnnotationComposer
   GeneratedColumn<double> get caloriesPer100g => $composableBuilder(
       column: $table.caloriesPer100g, builder: (column) => column);
 
+  GeneratedColumn<double> get proteinPer100g => $composableBuilder(
+      column: $table.proteinPer100g, builder: (column) => column);
+
+  GeneratedColumn<double> get carbsPer100g => $composableBuilder(
+      column: $table.carbsPer100g, builder: (column) => column);
+
+  GeneratedColumn<double> get fatPer100g => $composableBuilder(
+      column: $table.fatPer100g, builder: (column) => column);
+
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<bool> get isCustom =>
+      $composableBuilder(column: $table.isCustom, builder: (column) => column);
+
   Expression<T> mealEntriesRefs<T extends Object>(
       Expression<T> Function($$MealEntriesTableAnnotationComposer a) f) {
     final $$MealEntriesTableAnnotationComposer composer = $composerBuilder(
         composer: this,
         getCurrentColumn: (t) => t.id,
         referencedTable: $db.mealEntries,
-        getReferencedColumn: (t) => t.foodItemId,
+        getReferencedColumn: (t) => t.foodId,
         builder: (joinBuilder,
                 {$addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer}) =>
@@ -1840,53 +1247,71 @@ class $$FoodItemsTableAnnotationComposer
   }
 }
 
-class $$FoodItemsTableTableManager extends RootTableManager<
+class $$FoodsTableTableManager extends RootTableManager<
     _$AppDatabase,
-    $FoodItemsTable,
-    FoodItem,
-    $$FoodItemsTableFilterComposer,
-    $$FoodItemsTableOrderingComposer,
-    $$FoodItemsTableAnnotationComposer,
-    $$FoodItemsTableCreateCompanionBuilder,
-    $$FoodItemsTableUpdateCompanionBuilder,
-    (FoodItem, $$FoodItemsTableReferences),
-    FoodItem,
+    $FoodsTable,
+    Food,
+    $$FoodsTableFilterComposer,
+    $$FoodsTableOrderingComposer,
+    $$FoodsTableAnnotationComposer,
+    $$FoodsTableCreateCompanionBuilder,
+    $$FoodsTableUpdateCompanionBuilder,
+    (Food, $$FoodsTableReferences),
+    Food,
     PrefetchHooks Function({bool mealEntriesRefs})> {
-  $$FoodItemsTableTableManager(_$AppDatabase db, $FoodItemsTable table)
+  $$FoodsTableTableManager(_$AppDatabase db, $FoodsTable table)
       : super(TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$FoodItemsTableFilterComposer($db: db, $table: table),
+              $$FoodsTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$FoodItemsTableOrderingComposer($db: db, $table: table),
+              $$FoodsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$FoodItemsTableAnnotationComposer($db: db, $table: table),
+              $$FoodsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> name = const Value.absent(),
             Value<double> caloriesPer100g = const Value.absent(),
+            Value<double> proteinPer100g = const Value.absent(),
+            Value<double> carbsPer100g = const Value.absent(),
+            Value<double> fatPer100g = const Value.absent(),
+            Value<String> category = const Value.absent(),
+            Value<bool> isCustom = const Value.absent(),
           }) =>
-              FoodItemsCompanion(
+              FoodsCompanion(
             id: id,
             name: name,
             caloriesPer100g: caloriesPer100g,
+            proteinPer100g: proteinPer100g,
+            carbsPer100g: carbsPer100g,
+            fatPer100g: fatPer100g,
+            category: category,
+            isCustom: isCustom,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             required String name,
             required double caloriesPer100g,
+            required double proteinPer100g,
+            required double carbsPer100g,
+            required double fatPer100g,
+            Value<String> category = const Value.absent(),
+            Value<bool> isCustom = const Value.absent(),
           }) =>
-              FoodItemsCompanion.insert(
+              FoodsCompanion.insert(
             id: id,
             name: name,
             caloriesPer100g: caloriesPer100g,
+            proteinPer100g: proteinPer100g,
+            carbsPer100g: carbsPer100g,
+            fatPer100g: fatPer100g,
+            category: category,
+            isCustom: isCustom,
           ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (
-                    e.readTable(table),
-                    $$FoodItemsTableReferences(db, table, e)
-                  ))
+              .map((e) =>
+                  (e.readTable(table), $$FoodsTableReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: ({mealEntriesRefs = false}) {
             return PrefetchHooks(
@@ -1896,17 +1321,16 @@ class $$FoodItemsTableTableManager extends RootTableManager<
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (mealEntriesRefs)
-                    await $_getPrefetchedData<FoodItem, $FoodItemsTable,
-                            MealEntry>(
+                    await $_getPrefetchedData<Food, $FoodsTable, MealEntry>(
                         currentTable: table,
-                        referencedTable: $$FoodItemsTableReferences
-                            ._mealEntriesRefsTable(db),
+                        referencedTable:
+                            $$FoodsTableReferences._mealEntriesRefsTable(db),
                         managerFromTypedResult: (p0) =>
-                            $$FoodItemsTableReferences(db, table, p0)
+                            $$FoodsTableReferences(db, table, p0)
                                 .mealEntriesRefs,
-                        referencedItemsForCurrentItem:
-                            (item, referencedItems) => referencedItems
-                                .where((e) => e.foodItemId == item.id),
+                        referencedItemsForCurrentItem: (item,
+                                referencedItems) =>
+                            referencedItems.where((e) => e.foodId == item.id),
                         typedResults: items)
                 ];
               },
@@ -1915,63 +1339,48 @@ class $$FoodItemsTableTableManager extends RootTableManager<
         ));
 }
 
-typedef $$FoodItemsTableProcessedTableManager = ProcessedTableManager<
+typedef $$FoodsTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
-    $FoodItemsTable,
-    FoodItem,
-    $$FoodItemsTableFilterComposer,
-    $$FoodItemsTableOrderingComposer,
-    $$FoodItemsTableAnnotationComposer,
-    $$FoodItemsTableCreateCompanionBuilder,
-    $$FoodItemsTableUpdateCompanionBuilder,
-    (FoodItem, $$FoodItemsTableReferences),
-    FoodItem,
+    $FoodsTable,
+    Food,
+    $$FoodsTableFilterComposer,
+    $$FoodsTableOrderingComposer,
+    $$FoodsTableAnnotationComposer,
+    $$FoodsTableCreateCompanionBuilder,
+    $$FoodsTableUpdateCompanionBuilder,
+    (Food, $$FoodsTableReferences),
+    Food,
     PrefetchHooks Function({bool mealEntriesRefs})>;
 typedef $$MealEntriesTableCreateCompanionBuilder = MealEntriesCompanion
     Function({
   Value<int> id,
-  required int mealId,
-  Value<int> foodItemId,
-  Value<double> grams,
-  required double calories,
+  required int foodId,
+  required double grams,
+  required String mealSlot,
+  required DateTime loggedAt,
 });
 typedef $$MealEntriesTableUpdateCompanionBuilder = MealEntriesCompanion
     Function({
   Value<int> id,
-  Value<int> mealId,
-  Value<int> foodItemId,
+  Value<int> foodId,
   Value<double> grams,
-  Value<double> calories,
+  Value<String> mealSlot,
+  Value<DateTime> loggedAt,
 });
 
 final class $$MealEntriesTableReferences
     extends BaseReferences<_$AppDatabase, $MealEntriesTable, MealEntry> {
   $$MealEntriesTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static $MealsTable _mealIdTable(_$AppDatabase db) => db.meals
-      .createAlias($_aliasNameGenerator(db.mealEntries.mealId, db.meals.id));
+  static $FoodsTable _foodIdTable(_$AppDatabase db) => db.foods
+      .createAlias($_aliasNameGenerator(db.mealEntries.foodId, db.foods.id));
 
-  $$MealsTableProcessedTableManager get mealId {
-    final $_column = $_itemColumn<int>('meal_id')!;
+  $$FoodsTableProcessedTableManager get foodId {
+    final $_column = $_itemColumn<int>('food_id')!;
 
-    final manager = $$MealsTableTableManager($_db, $_db.meals)
+    final manager = $$FoodsTableTableManager($_db, $_db.foods)
         .filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_mealIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-        manager.$state.copyWith(prefetchedData: [item]));
-  }
-
-  static $FoodItemsTable _foodItemIdTable(_$AppDatabase db) =>
-      db.foodItems.createAlias(
-          $_aliasNameGenerator(db.mealEntries.foodItemId, db.foodItems.id));
-
-  $$FoodItemsTableProcessedTableManager get foodItemId {
-    final $_column = $_itemColumn<int>('food_item_id')!;
-
-    final manager = $$FoodItemsTableTableManager($_db, $_db.foodItems)
-        .filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_foodItemIdTable($_db));
+    final item = $_typedResult.readTableOrNull(_foodIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
         manager.$state.copyWith(prefetchedData: [item]));
@@ -1993,41 +1402,24 @@ class $$MealEntriesTableFilterComposer
   ColumnFilters<double> get grams => $composableBuilder(
       column: $table.grams, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get calories => $composableBuilder(
-      column: $table.calories, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get mealSlot => $composableBuilder(
+      column: $table.mealSlot, builder: (column) => ColumnFilters(column));
 
-  $$MealsTableFilterComposer get mealId {
-    final $$MealsTableFilterComposer composer = $composerBuilder(
+  ColumnFilters<DateTime> get loggedAt => $composableBuilder(
+      column: $table.loggedAt, builder: (column) => ColumnFilters(column));
+
+  $$FoodsTableFilterComposer get foodId {
+    final $$FoodsTableFilterComposer composer = $composerBuilder(
         composer: this,
-        getCurrentColumn: (t) => t.mealId,
-        referencedTable: $db.meals,
+        getCurrentColumn: (t) => t.foodId,
+        referencedTable: $db.foods,
         getReferencedColumn: (t) => t.id,
         builder: (joinBuilder,
                 {$addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer}) =>
-            $$MealsTableFilterComposer(
+            $$FoodsTableFilterComposer(
               $db: $db,
-              $table: $db.meals,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return composer;
-  }
-
-  $$FoodItemsTableFilterComposer get foodItemId {
-    final $$FoodItemsTableFilterComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.foodItemId,
-        referencedTable: $db.foodItems,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$FoodItemsTableFilterComposer(
-              $db: $db,
-              $table: $db.foodItems,
+              $table: $db.foods,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -2052,41 +1444,24 @@ class $$MealEntriesTableOrderingComposer
   ColumnOrderings<double> get grams => $composableBuilder(
       column: $table.grams, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get calories => $composableBuilder(
-      column: $table.calories, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get mealSlot => $composableBuilder(
+      column: $table.mealSlot, builder: (column) => ColumnOrderings(column));
 
-  $$MealsTableOrderingComposer get mealId {
-    final $$MealsTableOrderingComposer composer = $composerBuilder(
+  ColumnOrderings<DateTime> get loggedAt => $composableBuilder(
+      column: $table.loggedAt, builder: (column) => ColumnOrderings(column));
+
+  $$FoodsTableOrderingComposer get foodId {
+    final $$FoodsTableOrderingComposer composer = $composerBuilder(
         composer: this,
-        getCurrentColumn: (t) => t.mealId,
-        referencedTable: $db.meals,
+        getCurrentColumn: (t) => t.foodId,
+        referencedTable: $db.foods,
         getReferencedColumn: (t) => t.id,
         builder: (joinBuilder,
                 {$addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer}) =>
-            $$MealsTableOrderingComposer(
+            $$FoodsTableOrderingComposer(
               $db: $db,
-              $table: $db.meals,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return composer;
-  }
-
-  $$FoodItemsTableOrderingComposer get foodItemId {
-    final $$FoodItemsTableOrderingComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.foodItemId,
-        referencedTable: $db.foodItems,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$FoodItemsTableOrderingComposer(
-              $db: $db,
-              $table: $db.foodItems,
+              $table: $db.foods,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -2111,41 +1486,24 @@ class $$MealEntriesTableAnnotationComposer
   GeneratedColumn<double> get grams =>
       $composableBuilder(column: $table.grams, builder: (column) => column);
 
-  GeneratedColumn<double> get calories =>
-      $composableBuilder(column: $table.calories, builder: (column) => column);
+  GeneratedColumn<String> get mealSlot =>
+      $composableBuilder(column: $table.mealSlot, builder: (column) => column);
 
-  $$MealsTableAnnotationComposer get mealId {
-    final $$MealsTableAnnotationComposer composer = $composerBuilder(
+  GeneratedColumn<DateTime> get loggedAt =>
+      $composableBuilder(column: $table.loggedAt, builder: (column) => column);
+
+  $$FoodsTableAnnotationComposer get foodId {
+    final $$FoodsTableAnnotationComposer composer = $composerBuilder(
         composer: this,
-        getCurrentColumn: (t) => t.mealId,
-        referencedTable: $db.meals,
+        getCurrentColumn: (t) => t.foodId,
+        referencedTable: $db.foods,
         getReferencedColumn: (t) => t.id,
         builder: (joinBuilder,
                 {$addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer}) =>
-            $$MealsTableAnnotationComposer(
+            $$FoodsTableAnnotationComposer(
               $db: $db,
-              $table: $db.meals,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return composer;
-  }
-
-  $$FoodItemsTableAnnotationComposer get foodItemId {
-    final $$FoodItemsTableAnnotationComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.foodItemId,
-        referencedTable: $db.foodItems,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$FoodItemsTableAnnotationComposer(
-              $db: $db,
-              $table: $db.foodItems,
+              $table: $db.foods,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -2166,7 +1524,7 @@ class $$MealEntriesTableTableManager extends RootTableManager<
     $$MealEntriesTableUpdateCompanionBuilder,
     (MealEntry, $$MealEntriesTableReferences),
     MealEntry,
-    PrefetchHooks Function({bool mealId, bool foodItemId})> {
+    PrefetchHooks Function({bool foodId})> {
   $$MealEntriesTableTableManager(_$AppDatabase db, $MealEntriesTable table)
       : super(TableManagerState(
           db: db,
@@ -2179,31 +1537,31 @@ class $$MealEntriesTableTableManager extends RootTableManager<
               $$MealEntriesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
-            Value<int> mealId = const Value.absent(),
-            Value<int> foodItemId = const Value.absent(),
+            Value<int> foodId = const Value.absent(),
             Value<double> grams = const Value.absent(),
-            Value<double> calories = const Value.absent(),
+            Value<String> mealSlot = const Value.absent(),
+            Value<DateTime> loggedAt = const Value.absent(),
           }) =>
               MealEntriesCompanion(
             id: id,
-            mealId: mealId,
-            foodItemId: foodItemId,
+            foodId: foodId,
             grams: grams,
-            calories: calories,
+            mealSlot: mealSlot,
+            loggedAt: loggedAt,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
-            required int mealId,
-            Value<int> foodItemId = const Value.absent(),
-            Value<double> grams = const Value.absent(),
-            required double calories,
+            required int foodId,
+            required double grams,
+            required String mealSlot,
+            required DateTime loggedAt,
           }) =>
               MealEntriesCompanion.insert(
             id: id,
-            mealId: mealId,
-            foodItemId: foodItemId,
+            foodId: foodId,
             grams: grams,
-            calories: calories,
+            mealSlot: mealSlot,
+            loggedAt: loggedAt,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
@@ -2211,7 +1569,7 @@ class $$MealEntriesTableTableManager extends RootTableManager<
                     $$MealEntriesTableReferences(db, table, e)
                   ))
               .toList(),
-          prefetchHooksCallback: ({mealId = false, foodItemId = false}) {
+          prefetchHooksCallback: ({foodId = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [],
@@ -2228,24 +1586,14 @@ class $$MealEntriesTableTableManager extends RootTableManager<
                       dynamic,
                       dynamic,
                       dynamic>>(state) {
-                if (mealId) {
+                if (foodId) {
                   state = state.withJoin(
                     currentTable: table,
-                    currentColumn: table.mealId,
+                    currentColumn: table.foodId,
                     referencedTable:
-                        $$MealEntriesTableReferences._mealIdTable(db),
+                        $$MealEntriesTableReferences._foodIdTable(db),
                     referencedColumn:
-                        $$MealEntriesTableReferences._mealIdTable(db).id,
-                  ) as T;
-                }
-                if (foodItemId) {
-                  state = state.withJoin(
-                    currentTable: table,
-                    currentColumn: table.foodItemId,
-                    referencedTable:
-                        $$MealEntriesTableReferences._foodItemIdTable(db),
-                    referencedColumn:
-                        $$MealEntriesTableReferences._foodItemIdTable(db).id,
+                        $$MealEntriesTableReferences._foodIdTable(db).id,
                   ) as T;
                 }
 
@@ -2270,39 +1618,27 @@ typedef $$MealEntriesTableProcessedTableManager = ProcessedTableManager<
     $$MealEntriesTableUpdateCompanionBuilder,
     (MealEntry, $$MealEntriesTableReferences),
     MealEntry,
-    PrefetchHooks Function({bool mealId, bool foodItemId})>;
-typedef $$ExercisesTableCreateCompanionBuilder = ExercisesCompanion Function({
+    PrefetchHooks Function({bool foodId})>;
+typedef $$WorkoutSessionsTableCreateCompanionBuilder = WorkoutSessionsCompanion
+    Function({
   Value<int> id,
   required String name,
+  Value<int?> durationMinutes,
+  Value<String?> notes,
+  required DateTime performedAt,
 });
-typedef $$ExercisesTableUpdateCompanionBuilder = ExercisesCompanion Function({
+typedef $$WorkoutSessionsTableUpdateCompanionBuilder = WorkoutSessionsCompanion
+    Function({
   Value<int> id,
   Value<String> name,
+  Value<int?> durationMinutes,
+  Value<String?> notes,
+  Value<DateTime> performedAt,
 });
 
-final class $$ExercisesTableReferences
-    extends BaseReferences<_$AppDatabase, $ExercisesTable, Exercise> {
-  $$ExercisesTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static MultiTypedResultKey<$WorkoutSetsTable, List<WorkoutSet>>
-      _workoutSetsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-          db.workoutSets,
-          aliasName:
-              $_aliasNameGenerator(db.exercises.id, db.workoutSets.exerciseId));
-
-  $$WorkoutSetsTableProcessedTableManager get workoutSetsRefs {
-    final manager = $$WorkoutSetsTableTableManager($_db, $_db.workoutSets)
-        .filter((f) => f.exerciseId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_workoutSetsRefsTable($_db));
-    return ProcessedTableManager(
-        manager.$state.copyWith(prefetchedData: cache));
-  }
-}
-
-class $$ExercisesTableFilterComposer
-    extends Composer<_$AppDatabase, $ExercisesTable> {
-  $$ExercisesTableFilterComposer({
+class $$WorkoutSessionsTableFilterComposer
+    extends Composer<_$AppDatabase, $WorkoutSessionsTable> {
+  $$WorkoutSessionsTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -2315,31 +1651,20 @@ class $$ExercisesTableFilterComposer
   ColumnFilters<String> get name => $composableBuilder(
       column: $table.name, builder: (column) => ColumnFilters(column));
 
-  Expression<bool> workoutSetsRefs(
-      Expression<bool> Function($$WorkoutSetsTableFilterComposer f) f) {
-    final $$WorkoutSetsTableFilterComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.id,
-        referencedTable: $db.workoutSets,
-        getReferencedColumn: (t) => t.exerciseId,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$WorkoutSetsTableFilterComposer(
-              $db: $db,
-              $table: $db.workoutSets,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return f(composer);
-  }
+  ColumnFilters<int> get durationMinutes => $composableBuilder(
+      column: $table.durationMinutes,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get performedAt => $composableBuilder(
+      column: $table.performedAt, builder: (column) => ColumnFilters(column));
 }
 
-class $$ExercisesTableOrderingComposer
-    extends Composer<_$AppDatabase, $ExercisesTable> {
-  $$ExercisesTableOrderingComposer({
+class $$WorkoutSessionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $WorkoutSessionsTable> {
+  $$WorkoutSessionsTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -2351,11 +1676,21 @@ class $$ExercisesTableOrderingComposer
 
   ColumnOrderings<String> get name => $composableBuilder(
       column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get durationMinutes => $composableBuilder(
+      column: $table.durationMinutes,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get performedAt => $composableBuilder(
+      column: $table.performedAt, builder: (column) => ColumnOrderings(column));
 }
 
-class $$ExercisesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $ExercisesTable> {
-  $$ExercisesTableAnnotationComposer({
+class $$WorkoutSessionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $WorkoutSessionsTable> {
+  $$WorkoutSessionsTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -2368,700 +1703,100 @@ class $$ExercisesTableAnnotationComposer
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
 
-  Expression<T> workoutSetsRefs<T extends Object>(
-      Expression<T> Function($$WorkoutSetsTableAnnotationComposer a) f) {
-    final $$WorkoutSetsTableAnnotationComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.id,
-        referencedTable: $db.workoutSets,
-        getReferencedColumn: (t) => t.exerciseId,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$WorkoutSetsTableAnnotationComposer(
-              $db: $db,
-              $table: $db.workoutSets,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return f(composer);
-  }
-}
-
-class $$ExercisesTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $ExercisesTable,
-    Exercise,
-    $$ExercisesTableFilterComposer,
-    $$ExercisesTableOrderingComposer,
-    $$ExercisesTableAnnotationComposer,
-    $$ExercisesTableCreateCompanionBuilder,
-    $$ExercisesTableUpdateCompanionBuilder,
-    (Exercise, $$ExercisesTableReferences),
-    Exercise,
-    PrefetchHooks Function({bool workoutSetsRefs})> {
-  $$ExercisesTableTableManager(_$AppDatabase db, $ExercisesTable table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$ExercisesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$ExercisesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$ExercisesTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<String> name = const Value.absent(),
-          }) =>
-              ExercisesCompanion(
-            id: id,
-            name: name,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required String name,
-          }) =>
-              ExercisesCompanion.insert(
-            id: id,
-            name: name,
-          ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (
-                    e.readTable(table),
-                    $$ExercisesTableReferences(db, table, e)
-                  ))
-              .toList(),
-          prefetchHooksCallback: ({workoutSetsRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (workoutSetsRefs) db.workoutSets],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (workoutSetsRefs)
-                    await $_getPrefetchedData<Exercise, $ExercisesTable,
-                            WorkoutSet>(
-                        currentTable: table,
-                        referencedTable: $$ExercisesTableReferences
-                            ._workoutSetsRefsTable(db),
-                        managerFromTypedResult: (p0) =>
-                            $$ExercisesTableReferences(db, table, p0)
-                                .workoutSetsRefs,
-                        referencedItemsForCurrentItem:
-                            (item, referencedItems) => referencedItems
-                                .where((e) => e.exerciseId == item.id),
-                        typedResults: items)
-                ];
-              },
-            );
-          },
-        ));
-}
-
-typedef $$ExercisesTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $ExercisesTable,
-    Exercise,
-    $$ExercisesTableFilterComposer,
-    $$ExercisesTableOrderingComposer,
-    $$ExercisesTableAnnotationComposer,
-    $$ExercisesTableCreateCompanionBuilder,
-    $$ExercisesTableUpdateCompanionBuilder,
-    (Exercise, $$ExercisesTableReferences),
-    Exercise,
-    PrefetchHooks Function({bool workoutSetsRefs})>;
-typedef $$WorkoutsTableCreateCompanionBuilder = WorkoutsCompanion Function({
-  Value<int> id,
-  required DateTime startedAt,
-  Value<String?> notes,
-});
-typedef $$WorkoutsTableUpdateCompanionBuilder = WorkoutsCompanion Function({
-  Value<int> id,
-  Value<DateTime> startedAt,
-  Value<String?> notes,
-});
-
-final class $$WorkoutsTableReferences
-    extends BaseReferences<_$AppDatabase, $WorkoutsTable, Workout> {
-  $$WorkoutsTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static MultiTypedResultKey<$WorkoutSetsTable, List<WorkoutSet>>
-      _workoutSetsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-          db.workoutSets,
-          aliasName:
-              $_aliasNameGenerator(db.workouts.id, db.workoutSets.workoutId));
-
-  $$WorkoutSetsTableProcessedTableManager get workoutSetsRefs {
-    final manager = $$WorkoutSetsTableTableManager($_db, $_db.workoutSets)
-        .filter((f) => f.workoutId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_workoutSetsRefsTable($_db));
-    return ProcessedTableManager(
-        manager.$state.copyWith(prefetchedData: cache));
-  }
-}
-
-class $$WorkoutsTableFilterComposer
-    extends Composer<_$AppDatabase, $WorkoutsTable> {
-  $$WorkoutsTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<DateTime> get startedAt => $composableBuilder(
-      column: $table.startedAt, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get notes => $composableBuilder(
-      column: $table.notes, builder: (column) => ColumnFilters(column));
-
-  Expression<bool> workoutSetsRefs(
-      Expression<bool> Function($$WorkoutSetsTableFilterComposer f) f) {
-    final $$WorkoutSetsTableFilterComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.id,
-        referencedTable: $db.workoutSets,
-        getReferencedColumn: (t) => t.workoutId,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$WorkoutSetsTableFilterComposer(
-              $db: $db,
-              $table: $db.workoutSets,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return f(composer);
-  }
-}
-
-class $$WorkoutsTableOrderingComposer
-    extends Composer<_$AppDatabase, $WorkoutsTable> {
-  $$WorkoutsTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<DateTime> get startedAt => $composableBuilder(
-      column: $table.startedAt, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get notes => $composableBuilder(
-      column: $table.notes, builder: (column) => ColumnOrderings(column));
-}
-
-class $$WorkoutsTableAnnotationComposer
-    extends Composer<_$AppDatabase, $WorkoutsTable> {
-  $$WorkoutsTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<int> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get startedAt =>
-      $composableBuilder(column: $table.startedAt, builder: (column) => column);
+  GeneratedColumn<int> get durationMinutes => $composableBuilder(
+      column: $table.durationMinutes, builder: (column) => column);
 
   GeneratedColumn<String> get notes =>
       $composableBuilder(column: $table.notes, builder: (column) => column);
 
-  Expression<T> workoutSetsRefs<T extends Object>(
-      Expression<T> Function($$WorkoutSetsTableAnnotationComposer a) f) {
-    final $$WorkoutSetsTableAnnotationComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.id,
-        referencedTable: $db.workoutSets,
-        getReferencedColumn: (t) => t.workoutId,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$WorkoutSetsTableAnnotationComposer(
-              $db: $db,
-              $table: $db.workoutSets,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return f(composer);
-  }
+  GeneratedColumn<DateTime> get performedAt => $composableBuilder(
+      column: $table.performedAt, builder: (column) => column);
 }
 
-class $$WorkoutsTableTableManager extends RootTableManager<
+class $$WorkoutSessionsTableTableManager extends RootTableManager<
     _$AppDatabase,
-    $WorkoutsTable,
-    Workout,
-    $$WorkoutsTableFilterComposer,
-    $$WorkoutsTableOrderingComposer,
-    $$WorkoutsTableAnnotationComposer,
-    $$WorkoutsTableCreateCompanionBuilder,
-    $$WorkoutsTableUpdateCompanionBuilder,
-    (Workout, $$WorkoutsTableReferences),
-    Workout,
-    PrefetchHooks Function({bool workoutSetsRefs})> {
-  $$WorkoutsTableTableManager(_$AppDatabase db, $WorkoutsTable table)
+    $WorkoutSessionsTable,
+    WorkoutSession,
+    $$WorkoutSessionsTableFilterComposer,
+    $$WorkoutSessionsTableOrderingComposer,
+    $$WorkoutSessionsTableAnnotationComposer,
+    $$WorkoutSessionsTableCreateCompanionBuilder,
+    $$WorkoutSessionsTableUpdateCompanionBuilder,
+    (
+      WorkoutSession,
+      BaseReferences<_$AppDatabase, $WorkoutSessionsTable, WorkoutSession>
+    ),
+    WorkoutSession,
+    PrefetchHooks Function()> {
+  $$WorkoutSessionsTableTableManager(
+      _$AppDatabase db, $WorkoutSessionsTable table)
       : super(TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$WorkoutsTableFilterComposer($db: db, $table: table),
+              $$WorkoutSessionsTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$WorkoutsTableOrderingComposer($db: db, $table: table),
+              $$WorkoutSessionsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$WorkoutsTableAnnotationComposer($db: db, $table: table),
+              $$WorkoutSessionsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
-            Value<DateTime> startedAt = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<int?> durationMinutes = const Value.absent(),
             Value<String?> notes = const Value.absent(),
+            Value<DateTime> performedAt = const Value.absent(),
           }) =>
-              WorkoutsCompanion(
+              WorkoutSessionsCompanion(
             id: id,
-            startedAt: startedAt,
+            name: name,
+            durationMinutes: durationMinutes,
             notes: notes,
+            performedAt: performedAt,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
-            required DateTime startedAt,
+            required String name,
+            Value<int?> durationMinutes = const Value.absent(),
             Value<String?> notes = const Value.absent(),
+            required DateTime performedAt,
           }) =>
-              WorkoutsCompanion.insert(
+              WorkoutSessionsCompanion.insert(
             id: id,
-            startedAt: startedAt,
+            name: name,
+            durationMinutes: durationMinutes,
             notes: notes,
+            performedAt: performedAt,
           ),
           withReferenceMapper: (p0) => p0
-              .map((e) =>
-                  (e.readTable(table), $$WorkoutsTableReferences(db, table, e)))
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: ({workoutSetsRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (workoutSetsRefs) db.workoutSets],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (workoutSetsRefs)
-                    await $_getPrefetchedData<Workout, $WorkoutsTable,
-                            WorkoutSet>(
-                        currentTable: table,
-                        referencedTable:
-                            $$WorkoutsTableReferences._workoutSetsRefsTable(db),
-                        managerFromTypedResult: (p0) =>
-                            $$WorkoutsTableReferences(db, table, p0)
-                                .workoutSetsRefs,
-                        referencedItemsForCurrentItem:
-                            (item, referencedItems) => referencedItems
-                                .where((e) => e.workoutId == item.id),
-                        typedResults: items)
-                ];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ));
 }
 
-typedef $$WorkoutsTableProcessedTableManager = ProcessedTableManager<
+typedef $$WorkoutSessionsTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
-    $WorkoutsTable,
-    Workout,
-    $$WorkoutsTableFilterComposer,
-    $$WorkoutsTableOrderingComposer,
-    $$WorkoutsTableAnnotationComposer,
-    $$WorkoutsTableCreateCompanionBuilder,
-    $$WorkoutsTableUpdateCompanionBuilder,
-    (Workout, $$WorkoutsTableReferences),
-    Workout,
-    PrefetchHooks Function({bool workoutSetsRefs})>;
-typedef $$WorkoutSetsTableCreateCompanionBuilder = WorkoutSetsCompanion
-    Function({
-  Value<int> id,
-  required int workoutId,
-  required int exerciseId,
-  required int setNumber,
-  required int reps,
-  required double weightKg,
-});
-typedef $$WorkoutSetsTableUpdateCompanionBuilder = WorkoutSetsCompanion
-    Function({
-  Value<int> id,
-  Value<int> workoutId,
-  Value<int> exerciseId,
-  Value<int> setNumber,
-  Value<int> reps,
-  Value<double> weightKg,
-});
-
-final class $$WorkoutSetsTableReferences
-    extends BaseReferences<_$AppDatabase, $WorkoutSetsTable, WorkoutSet> {
-  $$WorkoutSetsTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $WorkoutsTable _workoutIdTable(_$AppDatabase db) =>
-      db.workouts.createAlias(
-          $_aliasNameGenerator(db.workoutSets.workoutId, db.workouts.id));
-
-  $$WorkoutsTableProcessedTableManager get workoutId {
-    final $_column = $_itemColumn<int>('workout_id')!;
-
-    final manager = $$WorkoutsTableTableManager($_db, $_db.workouts)
-        .filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_workoutIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-        manager.$state.copyWith(prefetchedData: [item]));
-  }
-
-  static $ExercisesTable _exerciseIdTable(_$AppDatabase db) =>
-      db.exercises.createAlias(
-          $_aliasNameGenerator(db.workoutSets.exerciseId, db.exercises.id));
-
-  $$ExercisesTableProcessedTableManager get exerciseId {
-    final $_column = $_itemColumn<int>('exercise_id')!;
-
-    final manager = $$ExercisesTableTableManager($_db, $_db.exercises)
-        .filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_exerciseIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-        manager.$state.copyWith(prefetchedData: [item]));
-  }
-}
-
-class $$WorkoutSetsTableFilterComposer
-    extends Composer<_$AppDatabase, $WorkoutSetsTable> {
-  $$WorkoutSetsTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<int> get setNumber => $composableBuilder(
-      column: $table.setNumber, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<int> get reps => $composableBuilder(
-      column: $table.reps, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<double> get weightKg => $composableBuilder(
-      column: $table.weightKg, builder: (column) => ColumnFilters(column));
-
-  $$WorkoutsTableFilterComposer get workoutId {
-    final $$WorkoutsTableFilterComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.workoutId,
-        referencedTable: $db.workouts,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$WorkoutsTableFilterComposer(
-              $db: $db,
-              $table: $db.workouts,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return composer;
-  }
-
-  $$ExercisesTableFilterComposer get exerciseId {
-    final $$ExercisesTableFilterComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.exerciseId,
-        referencedTable: $db.exercises,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$ExercisesTableFilterComposer(
-              $db: $db,
-              $table: $db.exercises,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return composer;
-  }
-}
-
-class $$WorkoutSetsTableOrderingComposer
-    extends Composer<_$AppDatabase, $WorkoutSetsTable> {
-  $$WorkoutSetsTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<int> get setNumber => $composableBuilder(
-      column: $table.setNumber, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<int> get reps => $composableBuilder(
-      column: $table.reps, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<double> get weightKg => $composableBuilder(
-      column: $table.weightKg, builder: (column) => ColumnOrderings(column));
-
-  $$WorkoutsTableOrderingComposer get workoutId {
-    final $$WorkoutsTableOrderingComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.workoutId,
-        referencedTable: $db.workouts,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$WorkoutsTableOrderingComposer(
-              $db: $db,
-              $table: $db.workouts,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return composer;
-  }
-
-  $$ExercisesTableOrderingComposer get exerciseId {
-    final $$ExercisesTableOrderingComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.exerciseId,
-        referencedTable: $db.exercises,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$ExercisesTableOrderingComposer(
-              $db: $db,
-              $table: $db.exercises,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return composer;
-  }
-}
-
-class $$WorkoutSetsTableAnnotationComposer
-    extends Composer<_$AppDatabase, $WorkoutSetsTable> {
-  $$WorkoutSetsTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<int> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<int> get setNumber =>
-      $composableBuilder(column: $table.setNumber, builder: (column) => column);
-
-  GeneratedColumn<int> get reps =>
-      $composableBuilder(column: $table.reps, builder: (column) => column);
-
-  GeneratedColumn<double> get weightKg =>
-      $composableBuilder(column: $table.weightKg, builder: (column) => column);
-
-  $$WorkoutsTableAnnotationComposer get workoutId {
-    final $$WorkoutsTableAnnotationComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.workoutId,
-        referencedTable: $db.workouts,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$WorkoutsTableAnnotationComposer(
-              $db: $db,
-              $table: $db.workouts,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return composer;
-  }
-
-  $$ExercisesTableAnnotationComposer get exerciseId {
-    final $$ExercisesTableAnnotationComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.exerciseId,
-        referencedTable: $db.exercises,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$ExercisesTableAnnotationComposer(
-              $db: $db,
-              $table: $db.exercises,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return composer;
-  }
-}
-
-class $$WorkoutSetsTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $WorkoutSetsTable,
-    WorkoutSet,
-    $$WorkoutSetsTableFilterComposer,
-    $$WorkoutSetsTableOrderingComposer,
-    $$WorkoutSetsTableAnnotationComposer,
-    $$WorkoutSetsTableCreateCompanionBuilder,
-    $$WorkoutSetsTableUpdateCompanionBuilder,
-    (WorkoutSet, $$WorkoutSetsTableReferences),
-    WorkoutSet,
-    PrefetchHooks Function({bool workoutId, bool exerciseId})> {
-  $$WorkoutSetsTableTableManager(_$AppDatabase db, $WorkoutSetsTable table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$WorkoutSetsTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$WorkoutSetsTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$WorkoutSetsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<int> workoutId = const Value.absent(),
-            Value<int> exerciseId = const Value.absent(),
-            Value<int> setNumber = const Value.absent(),
-            Value<int> reps = const Value.absent(),
-            Value<double> weightKg = const Value.absent(),
-          }) =>
-              WorkoutSetsCompanion(
-            id: id,
-            workoutId: workoutId,
-            exerciseId: exerciseId,
-            setNumber: setNumber,
-            reps: reps,
-            weightKg: weightKg,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required int workoutId,
-            required int exerciseId,
-            required int setNumber,
-            required int reps,
-            required double weightKg,
-          }) =>
-              WorkoutSetsCompanion.insert(
-            id: id,
-            workoutId: workoutId,
-            exerciseId: exerciseId,
-            setNumber: setNumber,
-            reps: reps,
-            weightKg: weightKg,
-          ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (
-                    e.readTable(table),
-                    $$WorkoutSetsTableReferences(db, table, e)
-                  ))
-              .toList(),
-          prefetchHooksCallback: ({workoutId = false, exerciseId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins: <
-                  T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic>>(state) {
-                if (workoutId) {
-                  state = state.withJoin(
-                    currentTable: table,
-                    currentColumn: table.workoutId,
-                    referencedTable:
-                        $$WorkoutSetsTableReferences._workoutIdTable(db),
-                    referencedColumn:
-                        $$WorkoutSetsTableReferences._workoutIdTable(db).id,
-                  ) as T;
-                }
-                if (exerciseId) {
-                  state = state.withJoin(
-                    currentTable: table,
-                    currentColumn: table.exerciseId,
-                    referencedTable:
-                        $$WorkoutSetsTableReferences._exerciseIdTable(db),
-                    referencedColumn:
-                        $$WorkoutSetsTableReferences._exerciseIdTable(db).id,
-                  ) as T;
-                }
-
-                return state;
-              },
-              getPrefetchedDataCallback: (items) async {
-                return [];
-              },
-            );
-          },
-        ));
-}
-
-typedef $$WorkoutSetsTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $WorkoutSetsTable,
-    WorkoutSet,
-    $$WorkoutSetsTableFilterComposer,
-    $$WorkoutSetsTableOrderingComposer,
-    $$WorkoutSetsTableAnnotationComposer,
-    $$WorkoutSetsTableCreateCompanionBuilder,
-    $$WorkoutSetsTableUpdateCompanionBuilder,
-    (WorkoutSet, $$WorkoutSetsTableReferences),
-    WorkoutSet,
-    PrefetchHooks Function({bool workoutId, bool exerciseId})>;
+    $WorkoutSessionsTable,
+    WorkoutSession,
+    $$WorkoutSessionsTableFilterComposer,
+    $$WorkoutSessionsTableOrderingComposer,
+    $$WorkoutSessionsTableAnnotationComposer,
+    $$WorkoutSessionsTableCreateCompanionBuilder,
+    $$WorkoutSessionsTableUpdateCompanionBuilder,
+    (
+      WorkoutSession,
+      BaseReferences<_$AppDatabase, $WorkoutSessionsTable, WorkoutSession>
+    ),
+    WorkoutSession,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
-  $$MealsTableTableManager get meals =>
-      $$MealsTableTableManager(_db, _db.meals);
-  $$FoodItemsTableTableManager get foodItems =>
-      $$FoodItemsTableTableManager(_db, _db.foodItems);
+  $$FoodsTableTableManager get foods =>
+      $$FoodsTableTableManager(_db, _db.foods);
   $$MealEntriesTableTableManager get mealEntries =>
       $$MealEntriesTableTableManager(_db, _db.mealEntries);
-  $$ExercisesTableTableManager get exercises =>
-      $$ExercisesTableTableManager(_db, _db.exercises);
-  $$WorkoutsTableTableManager get workouts =>
-      $$WorkoutsTableTableManager(_db, _db.workouts);
-  $$WorkoutSetsTableTableManager get workoutSets =>
-      $$WorkoutSetsTableTableManager(_db, _db.workoutSets);
+  $$WorkoutSessionsTableTableManager get workoutSessions =>
+      $$WorkoutSessionsTableTableManager(_db, _db.workoutSessions);
 }

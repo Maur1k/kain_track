@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../features/home/home_screen.dart';
+import 'app_theme.dart';
 
 class FitnessApp extends StatelessWidget {
   const FitnessApp({super.key});
@@ -10,10 +11,7 @@ class FitnessApp extends StatelessWidget {
     return MaterialApp(
       title: 'Kain Track',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorSchemeSeed: Colors.teal,
-        useMaterial3: true,
-      ),
+      theme: buildAppTheme(),
       home: const HomeScreen(),
     );
   }

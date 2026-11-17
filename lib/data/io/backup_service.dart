@@ -11,111 +11,73 @@ class BackupService {
   final AppDatabase _database;
 
   Future<String> exportJson() async {
-    final foodItems = await (_database.select(_database.foodItems)
-          ..orderBy([(item) => OrderingTerm.asc(item.id)]))
-        .get();
-    final meals = await (_database.select(_database.meals)
-          ..orderBy([(meal) => OrderingTerm.asc(meal.id)]))
+    final foods = await (_database.select(_database.foods)
+          ..orderBy([(food) => OrderingTerm.asc(food.id)]))
         .get();
     final mealEntries = await (_database.select(_database.mealEntries)
           ..orderBy([(entry) => OrderingTerm.asc(entry.id)]))
         .get();
-    final exercises = await (_database.select(_database.exercises)
-          ..orderBy([(exercise) => OrderingTerm.asc(exercise.id)]))
+    final workouts = await (_database.select(_database.workoutSessions)
+          ..orderBy([(session) => OrderingTerm.asc(session.id)]))
         .get();
-    final workouts = await (_database.select(_database.workouts)
-          ..orderBy([(workout) => OrderingTerm.asc(workout.id)]))
-        .get();
-    final workoutSets = await (_database.select(_database.workoutSets)
-          ..orderBy([(set) => OrderingTerm.asc(set.id)]))
-        .get();
-
     return const JsonEncoder.withIndent('  ').convert({
       'schema_version': _database.schemaVersion,
-      'food_items': foodItems.map(_foodItemToJson).toList(),
-      'meals': meals.map(_mealToJson).toList(),
+      'foods': foods.map(_foodToJson).toList(),
       'meal_entries': mealEntries.map(_mealEntryToJson).toList(),
-      'exercises': exercises.map(_exerciseToJson).toList(),
-      'workouts': workouts.map(_workoutToJson).toList(),
-      'workout_sets': workoutSets.map(_workoutSetToJson).toList(),
+      'workout_sessions': workouts.map(_workoutToJson).toList(),
     });
   }
 
   Future<void> importJson(String contents) async {
-    final document = _parseDocument(contents);
-    final tables = _validateDocument(document, _database.schemaVersion);
-
+    final tables = _validateDocument(_parseDocument(contents));
     await _database.transaction(() async {
-      await _database.delete(_database.workoutSets).go();
       await _database.delete(_database.mealEntries).go();
-      await _database.delete(_database.workouts).go();
-      await _database.delete(_database.exercises).go();
-      await _database.delete(_database.meals).go();
-      await _database.delete(_database.foodItems).go();
-
+      await _database.delete(_database.workoutSessions).go();
+      await _database.delete(_database.foods).go();
       await _database.batch((batch) {
         batch.insertAll(
-          _database.foodItems,
-          tables.foodItems
-              .map((row) => FoodItemsCompanion.insert(
-                    id: Value(row['id'] as int),
-                    name: row['name'] as String,
-                    caloriesPer100g: row['caloriesPer100g'] as double,
-                  ))
-              .toList(),
-        );
-        batch.insertAll(
-          _database.meals,
-          tables.meals
-              .map((row) => MealsCompanion.insert(
-                    id: Value(row['id'] as int),
-                    loggedAt: row['loggedAt'] as DateTime,
-                    mealType: Value(row['mealType'] as String),
-                  ))
+          _database.foods,
+          tables.foods
+              .map(
+                (row) => FoodsCompanion.insert(
+                  id: Value(row['id'] as int),
+                  name: row['name'] as String,
+                  caloriesPer100g: row['caloriesPer100g'] as double,
+                  proteinPer100g: row['proteinPer100g'] as double,
+                  carbsPer100g: row['carbsPer100g'] as double,
+                  fatPer100g: row['fatPer100g'] as double,
+                  category: Value(row['category'] as String),
+                  isCustom: Value(row['isCustom'] as bool),
+                ),
+              )
               .toList(),
         );
         batch.insertAll(
           _database.mealEntries,
           tables.mealEntries
-              .map((row) => MealEntriesCompanion.insert(
-                    id: Value(row['id'] as int),
-                    mealId: row['mealId'] as int,
-                    foodItemId: Value(row['foodItemId'] as int),
-                    grams: Value(row['grams'] as double),
-                    calories: row['calories'] as double,
-                  ))
+              .map(
+                (row) => MealEntriesCompanion.insert(
+                  id: Value(row['id'] as int),
+                  foodId: row['foodId'] as int,
+                  grams: row['grams'] as double,
+                  mealSlot: row['mealSlot'] as String,
+                  loggedAt: row['loggedAt'] as DateTime,
+                ),
+              )
               .toList(),
         );
         batch.insertAll(
-          _database.exercises,
-          tables.exercises
-              .map((row) => ExercisesCompanion.insert(
-                    id: Value(row['id'] as int),
-                    name: row['name'] as String,
-                  ))
-              .toList(),
-        );
-        batch.insertAll(
-          _database.workouts,
+          _database.workoutSessions,
           tables.workouts
-              .map((row) => WorkoutsCompanion.insert(
-                    id: Value(row['id'] as int),
-                    startedAt: row['startedAt'] as DateTime,
-                    notes: Value(row['notes'] as String?),
-                  ))
-              .toList(),
-        );
-        batch.insertAll(
-          _database.workoutSets,
-          tables.workoutSets
-              .map((row) => WorkoutSetsCompanion.insert(
-                    id: Value(row['id'] as int),
-                    workoutId: row['workoutId'] as int,
-                    exerciseId: row['exerciseId'] as int,
-                    setNumber: row['setNumber'] as int,
-                    reps: row['reps'] as int,
-                    weightKg: row['weightKg'] as double,
-                  ))
+              .map(
+                (row) => WorkoutSessionsCompanion.insert(
+                  id: Value(row['id'] as int),
+                  name: row['name'] as String,
+                  durationMinutes: Value(row['durationMinutes'] as int?),
+                  notes: Value(row['notes'] as String?),
+                  performedAt: row['performedAt'] as DateTime,
+                ),
+              )
               .toList(),
         );
       });
@@ -136,141 +98,93 @@ class BackupService {
     }
   }
 
-  static _BackupTables _validateDocument(
-    Map<String, dynamic> document,
-    int schemaVersion,
-  ) {
-    const tableKeys = {
-      'food_items',
-      'meals',
-      'meal_entries',
-      'exercises',
-      'workouts',
-      'workout_sets',
-    };
-    if (document['schema_version'] != schemaVersion) {
+  static _BackupTables _validateDocument(Map<String, dynamic> document) {
+    const keys = {'foods', 'meal_entries', 'workout_sessions'};
+    if (document['schema_version'] != AppDatabase.currentSchemaVersion) {
       throw FormatException(
         'Unsupported backup schema_version: ${document['schema_version']}.',
       );
     }
-    if (!document.keys.toSet().containsAll({'schema_version', ...tableKeys})) {
+    if (!document.keys.toSet().containsAll({'schema_version', ...keys})) {
       throw const FormatException('Backup is missing one or more tables.');
     }
-    final missingOrInvalid = document.entries
-        .where((entry) =>
-            entry.key != 'schema_version' && !tableKeys.contains(entry.key))
-        .map((entry) => entry.key)
-        .toList();
-    if (missingOrInvalid.isNotEmpty) {
-      throw FormatException(
-          'Backup contains unknown table: ${missingOrInvalid.first}.');
+    final unknown = document.keys.where(
+      (key) => key != 'schema_version' && !keys.contains(key),
+    );
+    if (unknown.isNotEmpty) {
+      throw FormatException('Backup contains unknown table: ${unknown.first}.');
     }
-
-    final foodItems = _rows(
-      document['food_items'],
-      'food_items',
-      {'id', 'name', 'caloriesPer100g'},
-      (row) => {
-        'id': _positiveInt(row, 'id', 'food_items'),
-        'name': _string(row, 'name', 'food_items'),
-        'caloriesPer100g': _finiteDouble(row, 'caloriesPer100g', 'food_items'),
-      },
-    );
-    final meals = _rows(
-      document['meals'],
-      'meals',
-      {'id', 'loggedAt', 'mealType'},
-      (row) => {
-        'id': _positiveInt(row, 'id', 'meals'),
-        'loggedAt': _dateTime(row, 'loggedAt', 'meals'),
-        'mealType': _string(row, 'mealType', 'meals'),
-      },
-    );
-    final mealEntries = _rows(
-      document['meal_entries'],
-      'meal_entries',
-      {'id', 'mealId', 'foodItemId', 'grams', 'calories'},
-      (row) => {
+    final foods = _rows(document['foods'], 'foods', {
+      'id',
+      'name',
+      'caloriesPer100g',
+      'proteinPer100g',
+      'carbsPer100g',
+      'fatPer100g',
+      'category',
+      'isCustom',
+    }, (row) {
+      return {
+        'id': _positiveInt(row, 'id', 'foods'),
+        'name': _string(row, 'name', 'foods'),
+        'caloriesPer100g': _number(row, 'caloriesPer100g', 'foods'),
+        'proteinPer100g': _number(row, 'proteinPer100g', 'foods'),
+        'carbsPer100g': _number(row, 'carbsPer100g', 'foods'),
+        'fatPer100g': _number(row, 'fatPer100g', 'foods'),
+        'category': row.containsKey('category')
+            ? _string(row, 'category', 'foods')
+            : 'Protein',
+        'isCustom': _bool(row, 'isCustom', 'foods'),
+      };
+    }, optionalFields: {'category'});
+    final mealEntries = _rows(document['meal_entries'], 'meal_entries', {
+      'id',
+      'foodId',
+      'grams',
+      'mealSlot',
+      'loggedAt',
+    }, (row) {
+      return {
         'id': _positiveInt(row, 'id', 'meal_entries'),
-        'mealId': _positiveInt(row, 'mealId', 'meal_entries'),
-        'foodItemId': _positiveInt(row, 'foodItemId', 'meal_entries'),
-        'grams': _finiteDouble(row, 'grams', 'meal_entries'),
-        'calories': _finiteDouble(row, 'calories', 'meal_entries'),
-      },
-    );
-    final exercises = _rows(
-      document['exercises'],
-      'exercises',
-      {'id', 'name'},
-      (row) => {
-        'id': _positiveInt(row, 'id', 'exercises'),
-        'name': _string(row, 'name', 'exercises'),
-      },
-    );
-    final workouts = _rows(
-      document['workouts'],
-      'workouts',
-      {'id', 'startedAt', 'notes'},
-      (row) => {
-        'id': _positiveInt(row, 'id', 'workouts'),
-        'startedAt': _dateTime(row, 'startedAt', 'workouts'),
-        'notes': _nullableString(row, 'notes', 'workouts'),
-      },
-    );
-    final workoutSets = _rows(
-      document['workout_sets'],
-      'workout_sets',
-      {'id', 'workoutId', 'exerciseId', 'setNumber', 'reps', 'weightKg'},
-      (row) => {
-        'id': _positiveInt(row, 'id', 'workout_sets'),
-        'workoutId': _positiveInt(row, 'workoutId', 'workout_sets'),
-        'exerciseId': _positiveInt(row, 'exerciseId', 'workout_sets'),
-        'setNumber': _positiveInt(row, 'setNumber', 'workout_sets'),
-        'reps': _positiveInt(row, 'reps', 'workout_sets'),
-        'weightKg': _finiteDouble(row, 'weightKg', 'workout_sets'),
-      },
-    );
-
-    _ensureUniqueIds(foodItems, 'food_items');
-    _ensureUniqueIds(meals, 'meals');
+        'foodId': _positiveInt(row, 'foodId', 'meal_entries'),
+        'grams': _positiveNumber(row, 'grams', 'meal_entries'),
+        'mealSlot': _string(row, 'mealSlot', 'meal_entries'),
+        'loggedAt': _dateTime(row, 'loggedAt', 'meal_entries'),
+      };
+    });
+    final workouts = _rows(document['workout_sessions'], 'workout_sessions', {
+      'id',
+      'name',
+      'durationMinutes',
+      'notes',
+      'performedAt',
+    }, (row) {
+      return {
+        'id': _positiveInt(row, 'id', 'workout_sessions'),
+        'name': _string(row, 'name', 'workout_sessions'),
+        'durationMinutes':
+            _nullableInt(row, 'durationMinutes', 'workout_sessions'),
+        'notes': _nullableString(row, 'notes', 'workout_sessions'),
+        'performedAt': _dateTime(row, 'performedAt', 'workout_sessions'),
+      };
+    });
+    _ensureUniqueIds(foods, 'foods');
     _ensureUniqueIds(mealEntries, 'meal_entries');
-    _ensureUniqueIds(exercises, 'exercises');
-    _ensureUniqueIds(workouts, 'workouts');
-    _ensureUniqueIds(workoutSets, 'workout_sets');
-    _ensureReferences(mealEntries, 'mealId', meals, 'meals', 'meal_entries');
-    _ensureReferences(
-      mealEntries,
-      'foodItemId',
-      foodItems,
-      'food_items',
-      'meal_entries',
-    );
-    _ensureReferences(
-        workoutSets, 'workoutId', workouts, 'workouts', 'workout_sets');
-    _ensureReferences(
-      workoutSets,
-      'exerciseId',
-      exercises,
-      'exercises',
-      'workout_sets',
-    );
-
+    _ensureUniqueIds(workouts, 'workout_sessions');
+    _ensureReferences(mealEntries, foods, 'foodId', 'foods', 'meal_entries');
     return _BackupTables(
-      foodItems: foodItems,
-      meals: meals,
+      foods: foods,
       mealEntries: mealEntries,
-      exercises: exercises,
       workouts: workouts,
-      workoutSets: workoutSets,
     );
   }
 
   static List<Map<String, dynamic>> _rows(
-    dynamic value,
-    String table,
-    Set<String> fields,
-    Map<String, dynamic> Function(Map<String, dynamic>) parse,
-  ) {
+      dynamic value,
+      String table,
+      Set<String> fields,
+      Map<String, dynamic> Function(Map<String, dynamic>) parse,
+      {Set<String> optionalFields = const {}}) {
     if (value is! List) {
       throw FormatException('Table "$table" must be an array.');
     }
@@ -280,7 +194,7 @@ class BackupService {
       if (row is! Map<String, dynamic>) {
         throw FormatException('$table row $rowNumber must be an object.');
       }
-      if (!row.keys.toSet().containsAll(fields)) {
+      if (!row.keys.toSet().containsAll(fields.difference(optionalFields))) {
         throw FormatException('$table row $rowNumber is missing a field.');
       }
       final unknown = row.keys.where((key) => !fields.contains(key));
@@ -304,10 +218,31 @@ class BackupService {
     return value;
   }
 
+  static int? _nullableInt(
+    Map<String, dynamic> row,
+    String field,
+    String table,
+  ) {
+    final value = row[field];
+    if (value != null && (value is! int || value <= 0)) {
+      throw FormatException(
+          '$table.$field must be a positive integer or null.');
+    }
+    return value as int?;
+  }
+
+  static bool _bool(Map<String, dynamic> row, String field, String table) {
+    final value = row[field];
+    if (value is! bool) {
+      throw FormatException('$table.$field must be a boolean.');
+    }
+    return value;
+  }
+
   static String _string(Map<String, dynamic> row, String field, String table) {
     final value = row[field];
-    if (value is! String) {
-      throw FormatException('$table.$field must be a string.');
+    if (value is! String || value.trim().isEmpty) {
+      throw FormatException('$table.$field must be a non-empty string.');
     }
     return value;
   }
@@ -324,16 +259,25 @@ class BackupService {
     return value as String?;
   }
 
-  static double _finiteDouble(
+  static double _number(Map<String, dynamic> row, String field, String table) {
+    final value = row[field];
+    if (value is! num ||
+        value is bool ||
+        !value.toDouble().isFinite ||
+        value < 0) {
+      throw FormatException('$table.$field must be a finite number.');
+    }
+    return value.toDouble();
+  }
+
+  static double _positiveNumber(
     Map<String, dynamic> row,
     String field,
     String table,
   ) {
-    final value = row[field];
-    if (value is! num || value is bool || !value.toDouble().isFinite) {
-      throw FormatException('$table.$field must be a finite number.');
-    }
-    return value.toDouble();
+    final value = _number(row, field, table);
+    if (value <= 0) throw FormatException('$table.$field must be positive.');
+    return value;
   }
 
   static DateTime _dateTime(
@@ -342,10 +286,7 @@ class BackupService {
     String table,
   ) {
     final value = row[field];
-    if (value is! String) {
-      throw FormatException('$table.$field must be an ISO-8601 string.');
-    }
-    final parsed = DateTime.tryParse(value);
+    final parsed = value is String ? DateTime.tryParse(value) : null;
     if (parsed == null) {
       throw FormatException('$table.$field must be an ISO-8601 string.');
     }
@@ -363,12 +304,12 @@ class BackupService {
 
   static void _ensureReferences(
     List<Map<String, dynamic>> rows,
+    List<Map<String, dynamic>> referenced,
     String field,
-    List<Map<String, dynamic>> referencedRows,
     String referencedTable,
     String table,
   ) {
-    final ids = referencedRows.map((row) => row['id'] as int).toSet();
+    final ids = referenced.map((row) => row['id'] as int).toSet();
     for (final row in rows) {
       if (!ids.contains(row[field])) {
         throw FormatException(
@@ -378,44 +319,31 @@ class BackupService {
     }
   }
 
-  static Map<String, dynamic> _foodItemToJson(FoodItem item) => {
-        'id': item.id,
-        'name': item.name,
-        'caloriesPer100g': item.caloriesPer100g,
-      };
-
-  static Map<String, dynamic> _mealToJson(Meal meal) => {
-        'id': meal.id,
-        'loggedAt': meal.loggedAt.toIso8601String(),
-        'mealType': meal.mealType,
+  static Map<String, dynamic> _foodToJson(Food food) => {
+        'id': food.id,
+        'name': food.name,
+        'caloriesPer100g': food.caloriesPer100g,
+        'proteinPer100g': food.proteinPer100g,
+        'carbsPer100g': food.carbsPer100g,
+        'fatPer100g': food.fatPer100g,
+        'category': food.category,
+        'isCustom': food.isCustom,
       };
 
   static Map<String, dynamic> _mealEntryToJson(MealEntry entry) => {
         'id': entry.id,
-        'mealId': entry.mealId,
-        'foodItemId': entry.foodItemId,
+        'foodId': entry.foodId,
         'grams': entry.grams,
-        'calories': entry.calories,
+        'mealSlot': entry.mealSlot,
+        'loggedAt': entry.loggedAt.toIso8601String(),
       };
 
-  static Map<String, dynamic> _exerciseToJson(Exercise exercise) => {
-        'id': exercise.id,
-        'name': exercise.name,
-      };
-
-  static Map<String, dynamic> _workoutToJson(Workout workout) => {
-        'id': workout.id,
-        'startedAt': workout.startedAt.toIso8601String(),
-        'notes': workout.notes,
-      };
-
-  static Map<String, dynamic> _workoutSetToJson(WorkoutSet set) => {
-        'id': set.id,
-        'workoutId': set.workoutId,
-        'exerciseId': set.exerciseId,
-        'setNumber': set.setNumber,
-        'reps': set.reps,
-        'weightKg': set.weightKg,
+  static Map<String, dynamic> _workoutToJson(WorkoutSession session) => {
+        'id': session.id,
+        'name': session.name,
+        'durationMinutes': session.durationMinutes,
+        'notes': session.notes,
+        'performedAt': session.performedAt.toIso8601String(),
       };
 }
 
@@ -425,18 +353,12 @@ final backupServiceProvider = Provider<BackupService>((ref) {
 
 class _BackupTables {
   const _BackupTables({
-    required this.foodItems,
-    required this.meals,
+    required this.foods,
     required this.mealEntries,
-    required this.exercises,
     required this.workouts,
-    required this.workoutSets,
   });
 
-  final List<Map<String, dynamic>> foodItems;
-  final List<Map<String, dynamic>> meals;
+  final List<Map<String, dynamic>> foods;
   final List<Map<String, dynamic>> mealEntries;
-  final List<Map<String, dynamic>> exercises;
   final List<Map<String, dynamic>> workouts;
-  final List<Map<String, dynamic>> workoutSets;
 }

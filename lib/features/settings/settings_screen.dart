@@ -8,7 +8,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../data/io/backup_service.dart';
+import '../../data/repositories/food_repository.dart';
 import '../../data/repositories/meal_repository.dart';
+import '../../data/repositories/workout_repository.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -46,8 +48,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       builder: (context) => AlertDialog(
         title: const Text('Replace all data?'),
         content: const Text(
-          'Importing replaces all meals, food items, workouts, exercises, '
-          'and sets currently on this device. This cannot be undone.',
+          'Importing replaces all foods, meal entries, and workout sessions '
+          'currently on this device. This cannot be undone.',
         ),
         actions: [
           TextButton(
@@ -73,7 +75,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       final contents = utf8.decode(await file.readAsBytes());
       await ref.read(backupServiceProvider).importJson(contents);
       if (mounted) {
-        ref.invalidate(todayCaloriesProvider);
+        ref.invalidate(todayNutritionProvider);
+        ref.invalidate(todayEntriesProvider);
+        ref.invalidate(todayWorkoutsProvider);
+        ref.invalidate(foodsProvider);
         _showMessage('Backup imported successfully.');
       }
     } on Object catch (error) {

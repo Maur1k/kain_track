@@ -10,8 +10,10 @@
 | sqlite3_flutter_libs | ^0.5.24 | MIT | Bundles SQLite native libraries for Flutter | Supports Android and iOS |
 | file_picker | ^13.3.3 | MIT | Select JSON files for backup import | Supports Android and iOS 18 through platform implementations |
 | share_plus | ^13.3.1 | BSD-3-Clause | Share exported JSON backup files | Supports Android and iOS 18 through platform implementations |
+| shared_preferences | ^2.5.5 | BSD-3-Clause | Persist nutrition goals locally on the device | Supports Android and iOS 18 through platform implementations |
+| google_fonts | ^8.2.1 | Apache-2.0 | Provide the Inter typeface for the app theme | Bundled font support; no Mac-only setup |
 | drift_dev | 2.30.0 (dev) | MIT | Drift code generation | Dev only; generated code targets Android and iOS |
-| build_runner | 2.15.1 (dev) | BSD-3-Clause | Runs Drift code generation | Dev only |
+| build_runner | ^2.10.4 (dev) | BSD-3-Clause | Runs Drift code generation | Dev only |
 
 Planned (add when implemented, verify license and iOS support first):
 - drift, drift_flutter, sqlite3_flutter_libs, path_provider, path (database)
