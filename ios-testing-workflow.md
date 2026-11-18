@@ -5,6 +5,8 @@ Target device: iPhone XR (iOS 18 max)
 ## Overview
 Develop on a Windows or Linux laptop, build the iOS app in the cloud, and install it on the iPhone from the laptop. The repository currently uses a public GitHub repository by explicit project-owner choice; a private repository is recommended because the project contains personal health data structure.
 
+The app bundle identifier is `com.maurik.kainTrack`. The Codemagic `ios-unsigned` workflow uses Flutter 3.38.9 and packages the release app as `kain_track-unsigned.ipa`.
+
 ## Steps
 
 1. **Develop on the laptop**
@@ -28,12 +30,13 @@ Develop on a Windows or Linux laptop, build the iOS app in the cloud, and instal
    - Download and install Sideloadly from `https://sideloadly.io/`.
    - Connect the iPhone XR to the laptop by USB, unlock it, and tap **Trust** if prompted.
    - Open Sideloadly, confirm the connected iPhone XR is selected, and drag `kain_track-unsigned.ipa` into the IPA field.
-   - Enter the Apple ID used for free sideloading, then click **Start** and complete any Apple ID verification prompts. Sideloadly applies the free personal signing required for installation; the Codemagic artifact itself is unsigned.
+   - Enter the Apple ID used for free sideloading, then click **Start** and complete any Apple ID verification prompts. Sideloadly signs the unsigned artifact for installation with a free personal Apple ID.
    - On the iPhone, open **Settings > General > VPN & Device Management**, select the Apple ID profile, and tap **Trust** if iOS asks.
-   - Launch Kain Track and verify meal, workout, and backup flows. A free Apple ID sideload expires after 7 days and must then be reinstalled.
+   - Launch Kain Track and verify meal, workout, and backup flows. A free Apple ID sideload expires after 7 days; reinstall and re-sign the IPA before it expires.
 
 ## Limitations
 - Free Apple ID sideloads expire after 7 days; reinstall weekly.
+- Re-signing is required after the 7-day expiry and whenever Sideloadly must apply a fresh free Apple ID signature.
 - Only a few sideloaded apps can be active at once.
 - Verify that Flutter and all plugins support iOS 18.
 - TestFlight or App Store distribution requires the Apple Developer Program ($99/year). Codemagic can sign and upload builds once enrolled.
@@ -45,4 +48,4 @@ Develop on a Windows or Linux laptop, build the iOS app in the cloud, and instal
 - [y] Codemagic `ios-unsigned` workflow selected
 - [y] Unsigned iOS `.ipa` build configured
 - [y] Sideloadly installed
-- [y] First build installed on iPhone XR
+- [ ] First build installed on iPhone XR

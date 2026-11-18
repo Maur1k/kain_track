@@ -48,3 +48,9 @@
 - Verified: Flutter `3.38.9` with Dart `3.10.8` is installed; `ios/Runner.xcodeproj` exists and targets iOS `13.0`; `flutter pub get`, `dart run build_runner build --delete-conflicting-outputs --force-jit`, `flutter analyze`, and `flutter test` completed successfully (17 tests); `codemagic.yaml` parsed successfully and contains the required workflow commands and artifact. Drift generation's `--force-jit` flag is a local Dart 3.10 workaround and must be re-checked after package updates.
 - Open: Run the real Codemagic cloud build, download the unsigned IPA, and install it with Sideloadly on the iPhone XR. The bundle identifier currently differs from the requested value: `com.maurik.kainTrack` (not `com.maurik.kain_track`).
 - Decisions needing user input: none. The GitHub repository is public by explicit choice; private visibility remains recommended for personal health-data structure.
+
+## 2026-11-18
+- Done: Implemented the redesigned Today screen, persistent validated nutrition goals, date selection, grams-based meal logging, categorized food library, custom foods, workouts tab, JSON backups including `category`, and date-specific meal reset. Added schema-v5 migration and seed backfill behavior.
+- Verified: Fresh databases contain 26 foods (18 prototype and 8 legacy). The v4-to-v5 migration backfills categories by name and preserves existing nutrition values. The iOS bundle identifier is `com.maurik.kainTrack`; the `ios-unsigned` workflow packages `kain_track-unsigned.ipa`.
+- Test suite: 22 tests cover migration behavior, backup round trips, goals persistence, meal/workout repositories, and Today, workout, meal, and food screens.
+- Known gaps: Custom foods default to Protein and cannot have category editing in the UI. Legacy foods remain alongside prototype foods. The Progress tab is a placeholder.

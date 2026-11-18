@@ -18,12 +18,10 @@ An offline mobile app for tracking calories (meals) and workouts. Personal proje
 - Ask before adding any feature outside the scope in `README.md`.
 
 ## Suggested First Steps
-1. Scaffold the Flutter project in this folder (`flutter create .`).
-2. Set up Drift with tables for `meals`, `food_items`, `workouts`, and `exercises`.
-3. Build a basic home screen with a daily calorie total and a "log meal" button.
-4. Add a workout log screen.
-5. Add JSON export and import.
-6. Configure the Codemagic iOS build (unsigned `.ipa`).
+1. Maintain the implemented Drift tables and schema migrations.
+2. Keep selected-date nutrition, goals, meal logging, foods, workouts, and backups consistent across the UI and repositories.
+3. Preserve JSON backup compatibility and the current schema version.
+4. Verify Android and iPhone XR builds before changing iOS delivery settings.
 
 ## Done Criteria
 - App runs on an Android emulator with `flutter run`.

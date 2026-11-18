@@ -6,16 +6,19 @@ All tools are free and open source. The app works fully offline.
 - **Framework:** Flutter (Dart), BSD license
 - **Target platforms:** Android (primary dev/test), iOS (via Codemagic + Sideloadly), optionally Windows/Linux desktop later
 - **Local database:** SQLite via **Drift** (type-safe Dart wrapper)
-- **State management:** **Riverpod** (Provider is an acceptable fallback)
+- **State management:** **Riverpod**
+- **Fonts:** `google_fonts` applies the Inter typeface in the app theme
 
 ## Packages
-- **fl_chart**: calorie trend and workout progress charts
-- **flutter_local_notifications**: meal and workout reminders (offline)
-- **file_picker** / **share_plus**: JSON or CSV export and import for backups
+- **drift** / **sqlite3_flutter_libs**: local SQLite persistence
+- **shared_preferences**: persistent nutrition goals
+- **file_picker** / **share_plus**: JSON backup import and export
+- **google_fonts**: Inter text theme
+- **path** / **path_provider**: database file location
 
 ## Data Sources
-- **USDA FoodData Central** (public domain): bundle a trimmed food dataset as a SQLite file in the app assets.
-- **Open Food Facts** (ODbL): optional. Requires attribution and share-alike for derived databases. Confirm before use.
+- The app uses a local seed library of 26 foods; no external dataset is bundled.
+- USDA FoodData Central and Open Food Facts are not currently bundled.
 
 ## Tooling
 - Android Studio + Flutter SDK; verify with `flutter doctor`
